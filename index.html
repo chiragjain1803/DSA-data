@@ -149,7 +149,7 @@ input[type="date"].hidden-date { position:absolute; top:0; left:0; width:100%; h
 .img-caption { font-size:10px; color:var(--muted); padding:0 12px 8px; text-align:center; }
 .img-count { font-size:11px; color:var(--crimson); font-weight:600; padding:4px 12px 0; }
 /* LIGHTBOX */
-.lightbox { position:fixed; inset:0; background:rgba(0,0,0,0.93); z-index:9000; display:none; flex-direction:column; align-items:center; justify-content:center; }
+.lightbox { position:fixed; inset:0; background:rgba(0,0,0,0.93); z-index:10000; display:none; flex-direction:column; align-items:center; justify-content:center; }
 .lightbox.open { display:flex; }
 .lightbox img { max-width:95vw; max-height:80vh; object-fit:contain; border-radius:8px; }
 .lightbox-close { position:absolute; top:calc(var(--safe-top) + 16px); right:20px; color:white; font-size:28px; cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.1); border-radius:50%; border:none; }
@@ -225,6 +225,20 @@ input[type="date"].edit-hidden-date { position:absolute; top:0; left:0; width:10
 .card-action-row { display:flex; gap:8px; margin-top:10px; }
 .card-action-row .btn-edit-case, .card-action-row .btn-delete-case { margin-top:0; flex:1; }
 
+/* STROKE FIELDS */
+.stroke-fields { display:none; }
+.stroke-fields.visible { display:block; }
+.stroke-banner { background:#EEF4FF; border-left:3px solid #2C4099; margin:0 16px 8px; border-radius:var(--radius); overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.stroke-banner .section-label { background:#D8E4FF; color:#1a2a6c; border-radius:0; }
+/* Edit photo grid in edit sheet */
+.edit-img-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; padding:10px 12px 6px; }
+.edit-img-thumb { position:relative; aspect-ratio:1; border-radius:8px; overflow:hidden; background:var(--surface); border:1.5px solid var(--line); cursor:pointer; }
+.edit-img-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.edit-img-thumb .edit-img-del { position:absolute; top:3px; right:3px; width:20px; height:20px; border-radius:50%; background:rgba(0,0,0,0.65); color:white; border:none; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; }
+.edit-img-add-btn { aspect-ratio:1; border-radius:8px; border:1.5px dashed var(--line); background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; color:var(--muted); gap:3px; font-size:11px; font-weight:500; }
+.edit-img-add-btn .plus { font-size:20px; color:var(--crimson); line-height:1; }
+.edit-img-count { font-size:11px; color:var(--crimson); font-weight:600; padding:4px 12px 0; }
+
 /* SETUP */
 .setup-view { padding:16px; }
 .setup-card { background:white; border-radius:var(--radius); padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); margin-bottom:16px; }
@@ -279,6 +293,10 @@ input[type="date"].edit-hidden-date { position:absolute; top:0; left:0; width:10
       <label>Patient ID / MRN</label>
       <input type="text" id="f_pid" placeholder="e.g. PT0045" autocomplete="off" autocorrect="off" autocapitalize="characters">
     </div>
+    <div class="field">
+      <label>Patient Name</label>
+      <input type="text" id="f_name" placeholder="Full name" autocomplete="off" autocorrect="off" autocapitalize="words">
+    </div>
     <!-- Date with calendar picker -->
     <div class="field date-field-wrap">
       <label>Date of Procedure</label>
@@ -311,7 +329,7 @@ input[type="date"].edit-hidden-date { position:absolute; top:0; left:0; width:10
     <div class="section-label">Procedure</div>
     <div class="field">
       <label>Indication</label>
-      <select id="f_indication">
+      <select id="f_indication" onchange="onIndicationChange()">
         <option value="">Select…</option>
         <option>Cerebral Aneurysm – Unruptured</option>
         <option>Cerebral Aneurysm – Ruptured (SAH)</option>
@@ -410,6 +428,35 @@ input[type="date"].edit-hidden-date { position:absolute; top:0; left:0; width:10
     </div>
   </div>
 
+  <!-- STROKE FIELDS — shown only for Acute Ischaemic Stroke -->
+  <div class="stroke-fields stroke-banner" id="strokeFieldsSection">
+    <div class="section-label">🧠 Stroke Parameters</div>
+    <div class="field">
+      <label>NIHSS Score (admission)</label>
+      <input type="number" id="f_nihss" placeholder="e.g. 18" min="0" max="42" inputmode="numeric">
+    </div>
+    <div class="field">
+      <label>Time of Symptom Onset</label>
+      <input type="time" id="f_onset" style="font-size:15px;padding:4px 16px 10px">
+    </div>
+    <div class="field">
+      <label>Time of Groin Puncture</label>
+      <input type="time" id="f_puncture" style="font-size:15px;padding:4px 16px 10px">
+    </div>
+    <div class="field">
+      <label>Time of Recanalization</label>
+      <input type="time" id="f_recan" style="font-size:15px;padding:4px 16px 10px">
+    </div>
+    <div class="field">
+      <label>Door-to-Puncture (min)</label>
+      <input type="number" id="f_d2p" placeholder="auto or manual" min="0" inputmode="numeric">
+    </div>
+    <div class="field">
+      <label>Onset-to-Recanalization (min)</label>
+      <input type="number" id="f_o2r" placeholder="auto or manual" min="0" inputmode="numeric">
+    </div>
+  </div>
+
   <!-- DEVICES — MULTIPLE with autocomplete -->
   <div class="form-section">
     <div class="section-label">Devices Used — Add Multiple</div>
@@ -451,13 +498,22 @@ input[type="date"].edit-hidden-date { position:absolute; top:0; left:0; width:10
       <label>Procedural Outcome</label>
       <select id="f_outcome">
         <option value="">Select…</option>
-        <option>Complete Occlusion (Raymond I)</option>
-        <option>Near-Complete (Raymond II)</option>
-        <option>Partial Occlusion (Raymond III)</option>
-        <option>Technical Success</option>
-        <option>Recanalization</option>
-        <option>Diagnostic Only – No Intervention</option>
-        <option>Abandoned / Incomplete</option>
+        <optgroup label="— Aneurysm / General —">
+          <option>Complete Occlusion (Raymond I)</option>
+          <option>Near-Complete (Raymond II)</option>
+          <option>Partial Occlusion (Raymond III)</option>
+          <option>Technical Success</option>
+          <option>Diagnostic Only – No Intervention</option>
+          <option>Abandoned / Incomplete</option>
+        </optgroup>
+        <optgroup label="— TICI Recanalization (Stroke) —">
+          <option>TICI 0 – No perfusion</option>
+          <option>TICI 1 – Minimal perfusion</option>
+          <option>TICI 2a – Partial (&lt;50% territory)</option>
+          <option>TICI 2b – Partial (≥50% territory)</option>
+          <option>TICI 2c – Near-complete perfusion</option>
+          <option>TICI 3 – Complete perfusion</option>
+        </optgroup>
       </select>
     </div>
     <div class="field">
@@ -621,6 +677,10 @@ function doGet(e) {
         <label>Patient ID / MRN</label>
         <input type="text" id="e_pid" autocomplete="off" autocorrect="off" autocapitalize="characters">
       </div>
+      <div class="edit-field">
+        <label>Patient Name</label>
+        <input type="text" id="e_name" autocomplete="off" autocorrect="off" autocapitalize="words">
+      </div>
       <div class="edit-field edit-date-wrap">
         <label>Date of Procedure</label>
         <div class="edit-date-display">
@@ -727,6 +787,37 @@ function doGet(e) {
       </div>
     </div>
 
+    <!-- Stroke fields in edit -->
+    <div class="edit-section stroke-fields" id="eStrokeSection">
+      <div class="edit-section-label" style="background:#D8E4FF;color:#1a2a6c">🧠 Stroke Parameters</div>
+      <div class="edit-field">
+        <label>NIHSS Score</label>
+        <input type="number" id="e_nihss" min="0" max="42" inputmode="numeric">
+      </div>
+      <div class="edit-field">
+        <label>Time of Symptom Onset</label>
+        <input type="time" id="e_onset" style="font-size:14px;padding:3px 14px 8px">
+      </div>
+      <div class="edit-field">
+        <label>Time of Groin Puncture</label>
+        <input type="time" id="e_puncture" style="font-size:14px;padding:3px 14px 8px">
+      </div>
+      <div class="edit-field">
+        <label>Time of Recanalization</label>
+        <input type="time" id="e_recan" style="font-size:14px;padding:3px 14px 8px">
+      </div>
+      <div class="edit-field-row">
+        <div class="edit-field">
+          <label>Door-to-Puncture (min)</label>
+          <input type="number" id="e_d2p" min="0" inputmode="numeric">
+        </div>
+        <div class="edit-field">
+          <label>Onset-to-Recan (min)</label>
+          <input type="number" id="e_o2r" min="0" inputmode="numeric">
+        </div>
+      </div>
+    </div>
+
     <!-- Devices (editable as free text in edit mode) -->
     <div class="edit-section">
       <div class="edit-section-label">Devices &amp; Sizes</div>
@@ -747,13 +838,22 @@ function doGet(e) {
         <label>Procedural Outcome</label>
         <select id="e_outcome">
           <option value="">Select…</option>
-          <option>Complete Occlusion (Raymond I)</option>
-          <option>Near-Complete (Raymond II)</option>
-          <option>Partial Occlusion (Raymond III)</option>
-          <option>Technical Success</option>
-          <option>Recanalization</option>
-          <option>Diagnostic Only – No Intervention</option>
-          <option>Abandoned / Incomplete</option>
+          <optgroup label="— Aneurysm / General —">
+            <option>Complete Occlusion (Raymond I)</option>
+            <option>Near-Complete (Raymond II)</option>
+            <option>Partial Occlusion (Raymond III)</option>
+            <option>Technical Success</option>
+            <option>Diagnostic Only – No Intervention</option>
+            <option>Abandoned / Incomplete</option>
+          </optgroup>
+          <optgroup label="— TICI Recanalization (Stroke) —">
+            <option>TICI 0 – No perfusion</option>
+            <option>TICI 1 – Minimal perfusion</option>
+            <option>TICI 2a – Partial (&lt;50% territory)</option>
+            <option>TICI 2b – Partial (≥50% territory)</option>
+            <option>TICI 2c – Near-complete perfusion</option>
+            <option>TICI 3 – Complete perfusion</option>
+          </optgroup>
         </select>
       </div>
       <div class="edit-field">
@@ -803,6 +903,14 @@ function doGet(e) {
         <label>Notes / Key Findings</label>
         <textarea id="e_notes" placeholder="Aneurysm size, morphology, follow-up plan…"></textarea>
       </div>
+    </div>
+
+    <!-- Photos in edit -->
+    <div class="edit-section">
+      <div class="edit-section-label">📷 Case Photos</div>
+      <div class="edit-img-count" id="editImgCount">Loading…</div>
+      <div class="edit-img-grid" id="editImgGrid"></div>
+      <input type="file" id="editImgInput" accept="image/*" multiple style="display:none" onchange="handleEditImgFiles(event)">
     </div>
 
     <button class="edit-save-btn" onclick="saveEditedCase()">
@@ -914,6 +1022,12 @@ function updateDateDisplay() {
   const [yr,mo,dy] = v.split('-');
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   document.getElementById('dateText').textContent = `${parseInt(dy)} ${months[parseInt(mo)-1]} ${yr}`;
+}
+
+// ── STROKE TOGGLE ────────────────────────────────────────────────────────────
+function onIndicationChange() {
+  const val = document.getElementById('f_indication').value;
+  document.getElementById('strokeFieldsSection').classList.toggle('visible', val === 'Acute Ischaemic Stroke');
 }
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
@@ -1055,14 +1169,50 @@ async function confirmDelete() {
 
 // ── EDIT SHEET ───────────────────────────────────────────────────────────────
 let editingTs = null;
+let editPendingImgs = [];
 
-function openEditSheet(ts) {
+function renderEditImgGrid() {
+  const grid = document.getElementById('editImgGrid');
+  const count = document.getElementById('editImgCount');
+  if (!grid) return;
+  count.textContent = editPendingImgs.length + ' photo' + (editPendingImgs.length !== 1 ? 's' : '');
+  let html = editPendingImgs.map((src, i) =>
+    '<div class="edit-img-thumb">' +
+    '<img src="' + src + '" onclick="openLightboxEdit(' + i + ')">' +
+    '<button class="edit-img-del" onclick="removeEditImg(' + i + ')">×</button>' +
+    '</div>'
+  ).join('');
+  html += '<div class="edit-img-add-btn" onclick="triggerEditImgPick()">' +
+          '<span class="plus">＋</span><span>Add</span></div>';
+  grid.innerHTML = html;
+}
+
+function removeEditImg(i) { editPendingImgs.splice(i,1); renderEditImgGrid(); }
+function triggerEditImgPick() { document.getElementById('editImgInput').click(); }
+
+function handleEditImgFiles(e) {
+  const files = Array.from(e.target.files);
+  let done = 0;
+  if (!files.length) return;
+  files.forEach(file => compressAndAddTo(file, editPendingImgs, () => {
+    done++;
+    if (done === files.length) renderEditImgGrid();
+  }));
+  e.target.value = '';
+}
+
+function openLightboxEdit(idx) {
+  lbImages = editPendingImgs; lbIdx = idx; showLightbox();
+}
+
+async function openEditSheet(ts) {
   const c = cases.find(x => x.ts === ts);
   if (!c) return;
   editingTs = ts;
 
   // Populate all fields
   document.getElementById('e_pid').value        = c.pid || '';
+  document.getElementById('e_name').value       = c.name || '';
   document.getElementById('e_age').value        = c.age || '';
   document.getElementById('e_devices').value    = c.devices || (c.deviceArr||[]).join(' | ') || '';
   document.getElementById('e_devicespec').value = c.devicespec || '';
@@ -1073,7 +1223,7 @@ function openEditSheet(ts) {
   document.getElementById('e_date').value = c.date || '';
   updateEditDateDisplay();
 
-  // Selects — set by value matching text
+  // Selects
   setSelectVal('e_gender', c.gender);
   setSelectVal('e_indication', c.indication);
   setSelectVal('e_proc', c.proc);
@@ -1083,8 +1233,23 @@ function openEditSheet(ts) {
   setSelectVal('e_teach', c.teach || '');
   setSelectVal('e_hdd', c.hdd || '');
 
+  // Stroke fields
+  const isStroke = c.indication === 'Acute Ischaemic Stroke';
+  document.getElementById('eStrokeSection').classList.toggle('visible', isStroke);
+  if (isStroke) {
+    document.getElementById('e_nihss').value    = c.nihss || '';
+    document.getElementById('e_onset').value    = c.onset || '';
+    document.getElementById('e_puncture').value = c.puncture || '';
+    document.getElementById('e_recan').value    = c.recan || '';
+    document.getElementById('e_d2p').value      = c.d2p || '';
+    document.getElementById('e_o2r').value      = c.o2r || '';
+  }
+
+  // Load photos from IDB
+  editPendingImgs = await loadImagesFromIDB(ts);
+  renderEditImgGrid();
+
   document.getElementById('editOverlay').classList.add('open');
-  // Scroll sheet to top
   document.getElementById('editSheet').scrollTop = 0;
 }
 
@@ -1115,7 +1280,7 @@ function closeEditSheet(e) {
   }
 }
 
-function saveEditedCase() {
+async function saveEditedCase() {
   if (!editingTs) return;
   const idx = cases.findIndex(x => x.ts === editingTs);
   if (idx === -1) return;
@@ -1145,14 +1310,28 @@ function saveEditedCase() {
   const specStr = document.getElementById('e_devicespec').value.trim();
   c.devicespec = specStr;
 
-  c.editedAt = new Date().toISOString();
+  c.name      = document.getElementById('e_name').value.trim();
+  const isStroke = c.indication === 'Acute Ischaemic Stroke';
+  if (isStroke) {
+    c.nihss    = document.getElementById('e_nihss').value.trim();
+    c.onset    = document.getElementById('e_onset').value;
+    c.puncture = document.getElementById('e_puncture').value;
+    c.recan    = document.getElementById('e_recan').value;
+    c.d2p      = document.getElementById('e_d2p').value.trim();
+    c.o2r      = document.getElementById('e_o2r').value.trim();
+  }
+  c.imageCount = editPendingImgs.length;
+  c.editedAt   = new Date().toISOString();
 
-  // Save
+  // Save metadata
   const casesForLS = cases.map(x => { const y={...x}; delete y.images; return y; });
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(casesForLS)); } catch(e) {}
+  // Save photos
+  await saveImagesToIDB(editingTs, [...editPendingImgs]);
 
   document.getElementById('editOverlay').classList.remove('open');
   editingTs = null;
+  editPendingImgs = [];
   renderCases();
   showToast('✅ Case updated', 'success');
 }
@@ -1171,8 +1350,10 @@ async function submitCase() {
   if (!pid)  { showToast('Enter a Patient ID', 'error'); return; }
   if (!date) { showToast('Select a date', 'error'); return; }
 
+  const isStroke = document.getElementById('f_indication').value === 'Acute Ischaemic Stroke';
   const row = {
     pid, date,
+    name:       document.getElementById('f_name').value.trim(),
     age:        document.getElementById('f_age').value.trim(),
     gender:     document.getElementById('f_gender').value,
     indication: document.getElementById('f_indication').value,
@@ -1190,6 +1371,12 @@ async function submitCase() {
     ts:         new Date().toISOString(),
     synced:     false,
     imageCount: pendingImages.length,
+    nihss:      isStroke ? document.getElementById('f_nihss').value.trim() : '',
+    onset:      isStroke ? document.getElementById('f_onset').value : '',
+    puncture:   isStroke ? document.getElementById('f_puncture').value : '',
+    recan:      isStroke ? document.getElementById('f_recan').value : '',
+    d2p:        isStroke ? document.getElementById('f_d2p').value.trim() : '',
+    o2r:        isStroke ? document.getElementById('f_o2r').value.trim() : '',
   };
 
   cases.unshift(row);
@@ -1221,9 +1408,13 @@ async function submitCase() {
 }
 
 function resetForm() {
-  ['f_pid','f_age','f_devicespec','f_path','f_notes'].forEach(id => document.getElementById(id).value='');
+  ['f_pid','f_name','f_age','f_devicespec','f_path','f_notes',
+    'f_nihss','f_onset','f_puncture','f_recan','f_d2p','f_o2r'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
   ['f_gender','f_indication','f_proc','f_territory','f_outcome','f_comp','f_hdd'].forEach(id => document.getElementById(id).selectedIndex=0);
   document.getElementById('f_device').value='';
+  document.getElementById('strokeFieldsSection').classList.remove('visible');
   addedDevices=[]; renderDeviceTags(); setTodayDate(); addedSizes=[]; renderSizeTags();
   pendingImages=[]; renderImgGrid();
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
@@ -1267,7 +1458,7 @@ function renderCases() {
 
     return `<div class="case-card ${isTeach?'teaching':''}">
       <div class="case-top">
-        <div class="case-pid">${c.pid||'—'}${demo?` <span style="font-weight:400;font-size:12px;color:var(--muted)">${demo}</span>`:''}</div>
+        <div class="case-pid">${c.pid||'—'}${c.name?' · <span style="font-weight:400;font-size:13px">'+c.name+'</span>':''}${demo?` <span style="font-weight:400;font-size:12px;color:var(--muted)">${demo}</span>`:''}</div>
         <div class="case-date">${fmtDate(c.date)}</div>
       </div>
       <div class="case-proc">${[c.proc,c.territory].filter(Boolean).join(' · ')||'Procedure not set'}</div>
@@ -1449,6 +1640,10 @@ function handleImgFiles(e) {
 }
 
 function compressAndAdd(file, cb) {
+  compressAndAddTo(file, pendingImages, cb);
+}
+
+function compressAndAddTo(file, targetArr, cb) {
   const reader = new FileReader();
   reader.onload = ev => {
     const img = new Image();
@@ -1463,7 +1658,7 @@ function compressAndAdd(file, cb) {
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       const compressed = canvas.toDataURL('image/jpeg', IMG_QUALITY);
       const kb = Math.round(compressed.length * 0.75 / 1024);
-      pendingImages.push(compressed);
+      targetArr.push(compressed);
       if (cb) cb();
       showToast('📸 Added (' + kb + ' KB)', '');
     };
