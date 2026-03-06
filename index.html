@@ -168,6 +168,63 @@ input[type="date"].hidden-date { position:absolute; top:0; left:0; width:100%; h
 .storage-label { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-bottom:4px; }
 
 
+/* DELETE CASE */
+.btn-delete-case { margin-top:10px; width:100%; padding:9px; border:1.5px solid #FCCACA; border-radius:10px; background:white; color:#C0392B; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; }
+.btn-delete-case:active { background:#FEE; }
+/* CONFIRM OVERLAY */
+.confirm-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:8000; display:none; align-items:flex-end; justify-content:center; }
+.confirm-overlay.open { display:flex; }
+.confirm-sheet { background:white; border-radius:20px 20px 0 0; padding:24px 20px calc(var(--safe-bot) + 20px); width:100%; max-width:480px; }
+.confirm-title { font-size:16px; font-weight:600; margin-bottom:6px; }
+.confirm-sub { font-size:13px; color:var(--muted); margin-bottom:20px; line-height:1.5; }
+.confirm-btns { display:flex; flex-direction:column; gap:10px; }
+.confirm-del { padding:14px; background:#C0392B; color:white; border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; }
+.confirm-cancel { padding:14px; background:var(--surface); color:var(--ink); border:none; border-radius:12px; font-size:15px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+/* SIZE TAGS per device */
+.device-sizes-row { display:flex; flex-wrap:wrap; gap:6px; padding:4px 16px 10px; border-top:1px solid var(--line); }
+.size-tag { display:inline-flex; align-items:center; gap:4px; background:#F0F4FF; border:1.5px solid #C5D0F0; border-radius:16px; padding:4px 8px 4px 10px; font-size:12px; color:#2C4099; font-weight:500; }
+.size-tag .sx { width:16px; height:16px; border-radius:50%; background:#2C4099; color:white; border:none; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.size-input-row { display:flex; border-top:1px solid var(--line); }
+.size-input-row input { flex:1; border:none; outline:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--ink); padding:9px 12px; }
+.size-add-btn { padding:9px 14px; background:#2C4099; color:white; border:none; font-size:13px; font-weight:700; cursor:pointer; border-radius:0 0 var(--radius) 0; }
+.size-section-label { padding:8px 16px 2px; font-size:10px; font-weight:600; color:#2C4099; letter-spacing:0.5px; text-transform:uppercase; border-top:1px solid var(--line); }
+
+/* EDIT SHEET */
+.edit-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:7000; display:none; align-items:flex-end; justify-content:center; }
+.edit-overlay.open { display:flex; }
+.edit-sheet { background:var(--surface); border-radius:22px 22px 0 0; width:100%; max-width:520px; max-height:92vh; overflow-y:auto; padding-bottom:calc(var(--safe-bot) + 16px); -webkit-overflow-scrolling:touch; }
+.edit-sheet-header { background:linear-gradient(135deg,var(--crimson-dk),var(--crimson)); padding:18px 20px 14px; border-radius:22px 22px 0 0; position:sticky; top:0; z-index:10; display:flex; justify-content:space-between; align-items:center; }
+.edit-sheet-title { color:white; font-size:16px; font-weight:600; }
+.edit-sheet-close { color:white; background:rgba(255,255,255,0.15); border:none; width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.edit-section { margin:12px 16px 0; background:white; border-radius:var(--radius); overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+.edit-section-label { background:var(--rose); color:var(--crimson-dk); font-size:10px; font-weight:600; letter-spacing:1px; padding:6px 14px; text-transform:uppercase; }
+.edit-field { border-bottom:1px solid var(--line); }
+.edit-field:last-child { border-bottom:none; }
+.edit-field label { display:block; font-size:10px; font-weight:600; color:var(--muted); letter-spacing:0.5px; text-transform:uppercase; padding:8px 14px 0; }
+.edit-field input, .edit-field select, .edit-field textarea { width:100%; border:none; outline:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--ink); padding:3px 14px 8px; appearance:none; -webkit-appearance:none; }
+.edit-field textarea { resize:none; min-height:60px; }
+.edit-field select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:32px; }
+.edit-field input:focus, .edit-field select:focus, .edit-field textarea:focus { background:var(--rose-lt); }
+.edit-field-row { display:flex; border-bottom:1px solid var(--line); }
+.edit-field-row .edit-field { flex:1; border-bottom:none; border-right:1px solid var(--line); }
+.edit-field-row .edit-field:last-child { border-right:none; }
+/* Edit date */
+.edit-date-wrap { position:relative; overflow:hidden; }
+.edit-date-display { padding:3px 14px 8px; font-size:14px; color:var(--ink); display:flex; align-items:center; justify-content:space-between; }
+input[type="date"].edit-hidden-date { position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; font-size:16px; }
+/* Edit device/size tags (read-only in edit sheet — use text field instead) */
+.edit-tags-display { display:flex; flex-wrap:wrap; gap:5px; padding:6px 14px 10px; }
+.edit-tag { background:var(--rose-lt); border:1.5px solid var(--rose); border-radius:16px; padding:3px 10px; font-size:12px; color:var(--crimson-dk); font-weight:500; }
+.edit-tag-blue { background:#F0F4FF; border-color:#C5D0F0; color:#2C4099; }
+/* Save button */
+.edit-save-btn { margin:14px 16px 4px; width:calc(100% - 32px); padding:14px; background:linear-gradient(135deg,var(--crimson),var(--crimson-lt)); color:white; border:none; border-radius:var(--radius); font-family:'DM Sans',sans-serif; font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 3px 12px rgba(123,24,24,0.3); }
+.edit-save-btn:active { transform:scale(0.98); }
+/* Edit button on card */
+.btn-edit-case { margin-top:8px; width:100%; padding:9px; border:1.5px solid var(--line); border-radius:10px; background:white; color:var(--crimson); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; }
+.btn-edit-case:active { background:var(--rose-lt); }
+.card-action-row { display:flex; gap:8px; margin-top:10px; }
+.card-action-row .btn-edit-case, .card-action-row .btn-delete-case { margin-top:0; flex:1; }
+
 /* SETUP */
 .setup-view { padding:16px; }
 .setup-card { background:white; border-radius:var(--radius); padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); margin-bottom:16px; }
@@ -373,10 +430,16 @@ input[type="date"].hidden-date { position:absolute; top:0; left:0; width:100%; h
           <button class="add-btn" onclick="addDevice()">＋</button>
         </div>
       </div>
-      <div class="spec-row">
-        <input type="text" id="f_devicespec"
-          placeholder="Sizes / specs for all devices (e.g. PED 3.5×20mm, Coils 3×8cm)…"
-          autocorrect="off">
+      <div class="size-section-label">Device Sizes &amp; Specs</div>
+      <div class="device-sizes-row" id="sizeTagList">
+        <span style="font-size:11px;color:#ccc">No sizes added yet</span>
+      </div>
+      <div class="size-input-row">
+        <input type="text" id="f_sizeInput"
+          placeholder="e.g. PED 3.5×20mm, Coil 4mm×8cm…"
+          autocorrect="off"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();addSize();}">
+        <button class="size-add-btn" onclick="addSize()">＋</button>
       </div>
     </div>
   </div>
@@ -445,10 +508,10 @@ input[type="date"].hidden-date { position:absolute; top:0; left:0; width:100%; h
 
   <!-- IMAGES -->
   <div class="img-section">
-    <div class="section-label" style="border-radius:var(--radius) var(--radius) 0 0">Case Images (up to 8) — Tap to add from camera or library</div>
+    <div class="section-label" style="border-radius:var(--radius) var(--radius) 0 0">Case Images — Tap ＋ to add from camera or library (unlimited)</div>
     <div class="img-count" id="imgCount">0 / 8 images</div>
     <div class="img-grid" id="imgGrid"></div>
-    <div class="img-caption">Images are compressed &amp; stored locally · Export as HTML to view on laptop</div>
+    <div class="img-caption">Each photo compressed on-device · Tap to view fullscreen · Export HTML for laptop</div>
     <input type="file" id="imgInput" accept="image/*" multiple style="display:none" onchange="handleImgFiles(event)">
   </div>
   <!-- STORAGE BAR -->
@@ -542,6 +605,225 @@ function doGet(e) {
   </div>
 </div>
 
+<!-- EDIT CASE SHEET -->
+<div class="edit-overlay" id="editOverlay" onclick="closeEditSheet(event)">
+  <div class="edit-sheet" id="editSheet">
+
+    <div class="edit-sheet-header">
+      <div class="edit-sheet-title">✏️ Edit Case</div>
+      <button class="edit-sheet-close" onclick="closeEditSheet()">✕</button>
+    </div>
+
+    <!-- Patient -->
+    <div class="edit-section">
+      <div class="edit-section-label">Patient Info</div>
+      <div class="edit-field">
+        <label>Patient ID / MRN</label>
+        <input type="text" id="e_pid" autocomplete="off" autocorrect="off" autocapitalize="characters">
+      </div>
+      <div class="edit-field edit-date-wrap">
+        <label>Date of Procedure</label>
+        <div class="edit-date-display">
+          <span id="eDateText" style="font-size:14px"></span>
+          <span style="font-size:14px">📅</span>
+        </div>
+        <input type="date" id="e_date" class="edit-hidden-date" oninput="updateEditDateDisplay()">
+      </div>
+      <div class="edit-field-row">
+        <div class="edit-field">
+          <label>Age (years)</label>
+          <input type="number" id="e_age" min="0" max="120" inputmode="numeric">
+        </div>
+        <div class="edit-field">
+          <label>Gender</label>
+          <select id="e_gender">
+            <option value="">—</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+            <option value="O">Other</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Procedure -->
+    <div class="edit-section">
+      <div class="edit-section-label">Procedure</div>
+      <div class="edit-field">
+        <label>Indication</label>
+        <select id="e_indication">
+          <option value="">Select…</option>
+          <option>Cerebral Aneurysm – Unruptured</option>
+          <option>Cerebral Aneurysm – Ruptured (SAH)</option>
+          <option>Cerebral AVM</option>
+          <option>Dural AV Fistula (DAVF)</option>
+          <option>Carotid Stenosis</option>
+          <option>Acute Ischaemic Stroke</option>
+          <option>Cerebral Venous Sinus Thrombosis</option>
+          <option>Intracranial Tumour Embolisation</option>
+          <option>Epistaxis</option>
+          <option>Head &amp; Neck Vascular Malformation</option>
+          <option>Spinal AVM / DAVF</option>
+          <option>Traumatic Vascular Injury</option>
+          <option>Diagnostic Only</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="edit-field">
+        <label>Procedure Type</label>
+        <select id="e_proc">
+          <option value="">Select…</option>
+          <option>Cerebral DSA – Diagnostic</option>
+          <option>Cerebral DSA – Interventional</option>
+          <option>Intracranial Aneurysm Coiling</option>
+          <option>Flow Diverter Placement</option>
+          <option>AVM Embolisation</option>
+          <option>DAVF Embolisation</option>
+          <option>Carotid Artery Stenting (CAS)</option>
+          <option>Mechanical Thrombectomy</option>
+          <option>Intra-arterial Thrombolysis</option>
+          <option>Tumour Embolisation</option>
+          <option>Epistaxis Embolisation</option>
+          <option>Balloon Test Occlusion (BTO)</option>
+          <option>Venous Sinus Stenting</option>
+          <option>Spinal DSA</option>
+          <option>Spinal AVM / DAVF Embolisation</option>
+        </select>
+      </div>
+      <div class="edit-field">
+        <label>Territory / Vessel</label>
+        <select id="e_territory">
+          <option value="">Select…</option>
+          <optgroup label="— Internal Carotid —"><option>Right ICA</option><option>Left ICA</option></optgroup>
+          <optgroup label="— Anterior Circulation —">
+            <option>Right MCA (M1)</option><option>Right MCA (M2)</option>
+            <option>Left MCA (M1)</option><option>Left MCA (M2)</option>
+            <option>Right ACA</option><option>Left ACA</option>
+            <option>ACOM (Anterior Communicating Artery)</option>
+          </optgroup>
+          <optgroup label="— Communicating Arteries —"><option>Right PCOM</option><option>Left PCOM</option></optgroup>
+          <optgroup label="— Posterior Circulation —">
+            <option>Basilar Artery</option><option>Right PCA</option><option>Left PCA</option>
+            <option>Right Vertebral Artery</option><option>Left Vertebral Artery</option>
+            <option>PICA (Right)</option><option>PICA (Left)</option>
+            <option>AICA (Right)</option><option>AICA (Left)</option>
+            <option>SCA (Right)</option><option>SCA (Left)</option>
+          </optgroup>
+          <optgroup label="— Other Intracranial —">
+            <option>Ophthalmic Artery (Right)</option><option>Ophthalmic Artery (Left)</option>
+            <option>Anterior Choroidal (Right)</option><option>Anterior Choroidal (Left)</option>
+            <option>Lenticulostriate Arteries</option><option>Dural Sinuses / Venous</option>
+          </optgroup>
+          <optgroup label="— Extracranial / Cervical —">
+            <option>Right CCA</option><option>Left CCA</option>
+            <option>Right ECA</option><option>Left ECA</option>
+            <option>Right Subclavian</option><option>Left Subclavian</option>
+          </optgroup>
+          <optgroup label="— Spinal —">
+            <option>Cervical Spinal Vessels</option><option>Thoracic Spinal Vessels</option>
+            <option>Lumbar Spinal Vessels</option><option>Artery of Adamkiewicz</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
+    <!-- Devices (editable as free text in edit mode) -->
+    <div class="edit-section">
+      <div class="edit-section-label">Devices &amp; Sizes</div>
+      <div class="edit-field">
+        <label>Devices Used (separate with |)</label>
+        <input type="text" id="e_devices" placeholder="e.g. Pipeline PED | Coils – GDC" autocorrect="off">
+      </div>
+      <div class="edit-field">
+        <label>Device Sizes / Specs (separate with |)</label>
+        <input type="text" id="e_devicespec" placeholder="e.g. PED 3.5×20mm | Coil 4mm×8cm" autocorrect="off">
+      </div>
+    </div>
+
+    <!-- Outcome -->
+    <div class="edit-section">
+      <div class="edit-section-label">Outcome</div>
+      <div class="edit-field">
+        <label>Procedural Outcome</label>
+        <select id="e_outcome">
+          <option value="">Select…</option>
+          <option>Complete Occlusion (Raymond I)</option>
+          <option>Near-Complete (Raymond II)</option>
+          <option>Partial Occlusion (Raymond III)</option>
+          <option>Technical Success</option>
+          <option>Recanalization</option>
+          <option>Diagnostic Only – No Intervention</option>
+          <option>Abandoned / Incomplete</option>
+        </select>
+      </div>
+      <div class="edit-field">
+        <label>Complications</label>
+        <select id="e_comp">
+          <option value="">None</option>
+          <option>Vasospasm</option>
+          <option>Thromboembolic Event</option>
+          <option>Intra-procedural Rupture</option>
+          <option>Coil Herniation / Migration</option>
+          <option>Access Site Haematoma</option>
+          <option>Contrast Reaction</option>
+          <option>Neurological Deficit – Transient</option>
+          <option>Neurological Deficit – Permanent</option>
+          <option>Death</option>
+          <option>Other (see notes)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Storage — the fields you'll fill in later -->
+    <div class="edit-section">
+      <div class="edit-section-label">📦 Storage &amp; Classification</div>
+      <div class="edit-field">
+        <label>Teaching Case</label>
+        <select id="e_teach">
+          <option value="">—</option>
+          <option>Not Teaching</option>
+          <option>Teaching ⭐</option>
+          <option>Conference 🎤</option>
+          <option>Publication 📄</option>
+        </select>
+      </div>
+      <div class="edit-field">
+        <label>HDD Label</label>
+        <select id="e_hdd">
+          <option value="">Select…</option>
+          <option>HDD1</option><option>HDD2</option><option>HDD3</option>
+          <option>HDD4</option><option>HDD5</option><option>NAS</option><option>Cloud</option>
+        </select>
+      </div>
+      <div class="edit-field">
+        <label>Folder Path</label>
+        <input type="text" id="e_path" placeholder="HDD2/2024-03/PT0045_PED_ICA" autocorrect="off" autocapitalize="none">
+      </div>
+      <div class="edit-field">
+        <label>Notes / Key Findings</label>
+        <textarea id="e_notes" placeholder="Aneurysm size, morphology, follow-up plan…"></textarea>
+      </div>
+    </div>
+
+    <button class="edit-save-btn" onclick="saveEditedCase()">
+      <span>✅</span> Save Changes
+    </button>
+
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="confirm-overlay" id="confirmOverlay" onclick="cancelDelete(event)">
+  <div class="confirm-sheet">
+    <div class="confirm-title">Delete this case?</div>
+    <div class="confirm-sub" id="confirmSub">This will permanently remove the case and all its images from your device.</div>
+    <div class="confirm-btns">
+      <button class="confirm-del" onclick="confirmDelete()">🗑 Yes, Delete Case</button>
+      <button class="confirm-cancel" onclick="closeConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
@@ -605,7 +887,7 @@ const DEFAULT_DEVICES = [
 ];
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-let cases = [], customDevices = [], allDevices = [], addedDevices = [], selectedTeach = '';
+let cases = [], customDevices = [], allDevices = [], addedDevices = [], selectedTeach = '', addedSizes = [];
 
 try { cases = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) {}
 try { customDevices = JSON.parse(localStorage.getItem(DEVICES_KEY) || '[]'); } catch(e) {}
@@ -715,6 +997,166 @@ function hideDeviceSuggsDelayed() {
   setTimeout(() => document.getElementById('deviceSugg').classList.remove('open'), 200);
 }
 
+// ── SIZES ────────────────────────────────────────────────────────────────────
+function addSize() {
+  const inp = document.getElementById('f_sizeInput');
+  const val = inp.value.trim();
+  if (!val) return;
+  addedSizes.push(val);
+  renderSizeTags();
+  inp.value = '';
+  inp.focus();
+}
+
+function removeSize(i) { addedSizes.splice(i,1); renderSizeTags(); }
+
+function renderSizeTags() {
+  const el = document.getElementById('sizeTagList');
+  if (!addedSizes.length) {
+    el.innerHTML = '<span style="font-size:11px;color:#ccc">No sizes added yet</span>';
+    return;
+  }
+  el.innerHTML = addedSizes.map((s,i) =>
+    '<div class="size-tag">' + s +
+    '<button class="sx" onclick="removeSize(' + i + ')">×</button></div>'
+  ).join('');
+}
+
+// ── DELETE CASE ───────────────────────────────────────────────────────────────
+let pendingDeleteTs = null;
+
+function promptDeleteCase(ts, pid) {
+  pendingDeleteTs = ts;
+  document.getElementById('confirmSub').textContent =
+    'This will permanently remove case ' + pid + ' and all its images from your device.';
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+
+function cancelDelete(e) {
+  if (!e || e.target === document.getElementById('confirmOverlay')) closeConfirm();
+}
+
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  pendingDeleteTs = null;
+}
+
+async function confirmDelete() {
+  if (!pendingDeleteTs) return;
+  const ts = pendingDeleteTs;
+  cases = cases.filter(c => c.ts !== ts);
+  const casesForLS = cases.map(c => { const x={...c}; delete x.images; return x; });
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(casesForLS)); } catch(e) {}
+  await deleteImagesFromIDB(ts);
+  closeConfirm();
+  renderCases();
+  showToast('Case deleted', '');
+}
+
+// ── EDIT SHEET ───────────────────────────────────────────────────────────────
+let editingTs = null;
+
+function openEditSheet(ts) {
+  const c = cases.find(x => x.ts === ts);
+  if (!c) return;
+  editingTs = ts;
+
+  // Populate all fields
+  document.getElementById('e_pid').value        = c.pid || '';
+  document.getElementById('e_age').value        = c.age || '';
+  document.getElementById('e_devices').value    = c.devices || (c.deviceArr||[]).join(' | ') || '';
+  document.getElementById('e_devicespec').value = c.devicespec || '';
+  document.getElementById('e_path').value       = c.path || '';
+  document.getElementById('e_notes').value      = c.notes || '';
+
+  // Date
+  document.getElementById('e_date').value = c.date || '';
+  updateEditDateDisplay();
+
+  // Selects — set by value matching text
+  setSelectVal('e_gender', c.gender);
+  setSelectVal('e_indication', c.indication);
+  setSelectVal('e_proc', c.proc);
+  setSelectVal('e_territory', c.territory);
+  setSelectVal('e_outcome', c.outcome);
+  setSelectVal('e_comp', c.comp || '');
+  setSelectVal('e_teach', c.teach || '');
+  setSelectVal('e_hdd', c.hdd || '');
+
+  document.getElementById('editOverlay').classList.add('open');
+  // Scroll sheet to top
+  document.getElementById('editSheet').scrollTop = 0;
+}
+
+function setSelectVal(id, val) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  // Try exact match first
+  for (let i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === val || sel.options[i].text === val) {
+      sel.selectedIndex = i; return;
+    }
+  }
+  sel.selectedIndex = 0;
+}
+
+function updateEditDateDisplay() {
+  const v = document.getElementById('e_date').value;
+  if (!v) { document.getElementById('eDateText').textContent = 'Tap to select'; return; }
+  const [yr,mo,dy] = v.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('eDateText').textContent = parseInt(dy) + ' ' + months[parseInt(mo)-1] + ' ' + yr;
+}
+
+function closeEditSheet(e) {
+  if (!e || e.target === document.getElementById('editOverlay')) {
+    document.getElementById('editOverlay').classList.remove('open');
+    editingTs = null;
+  }
+}
+
+function saveEditedCase() {
+  if (!editingTs) return;
+  const idx = cases.findIndex(x => x.ts === editingTs);
+  if (idx === -1) return;
+
+  const c = cases[idx];
+
+  // Update all fields
+  c.pid        = document.getElementById('e_pid').value.trim();
+  c.date       = document.getElementById('e_date').value;
+  c.age        = document.getElementById('e_age').value.trim();
+  c.gender     = document.getElementById('e_gender').value;
+  c.indication = document.getElementById('e_indication').value;
+  c.proc       = document.getElementById('e_proc').value;
+  c.territory  = document.getElementById('e_territory').value;
+  c.outcome    = document.getElementById('e_outcome').value;
+  c.comp       = document.getElementById('e_comp').value;
+  c.teach      = document.getElementById('e_teach').value;
+  c.hdd        = document.getElementById('e_hdd').value;
+  c.path       = document.getElementById('e_path').value.trim();
+  c.notes      = document.getElementById('e_notes').value.trim();
+
+  // Devices — parse pipe-separated back to array
+  const devStr = document.getElementById('e_devices').value.trim();
+  c.devices    = devStr;
+  c.deviceArr  = devStr ? devStr.split('|').map(s=>s.trim()).filter(Boolean) : [];
+
+  const specStr = document.getElementById('e_devicespec').value.trim();
+  c.devicespec = specStr;
+
+  c.editedAt = new Date().toISOString();
+
+  // Save
+  const casesForLS = cases.map(x => { const y={...x}; delete y.images; return y; });
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(casesForLS)); } catch(e) {}
+
+  document.getElementById('editOverlay').classList.remove('open');
+  editingTs = null;
+  renderCases();
+  showToast('✅ Case updated', 'success');
+}
+
 // ── CHIPS ─────────────────────────────────────────────────────────────────────
 function toggleChip(el) {
   document.querySelectorAll('#teachChips .chip').forEach(c => c.classList.remove('selected'));
@@ -738,7 +1180,7 @@ async function submitCase() {
     territory:  document.getElementById('f_territory').value,
     devices:    addedDevices.join(' | '),
     deviceArr:  [...addedDevices],
-    devicespec: document.getElementById('f_devicespec').value.trim(),
+    devicespec: addedSizes.join(' | '),
     outcome:    document.getElementById('f_outcome').value,
     comp:       document.getElementById('f_comp').value,
     teach:      selectedTeach,
@@ -782,7 +1224,7 @@ function resetForm() {
   ['f_pid','f_age','f_devicespec','f_path','f_notes'].forEach(id => document.getElementById(id).value='');
   ['f_gender','f_indication','f_proc','f_territory','f_outcome','f_comp','f_hdd'].forEach(id => document.getElementById(id).selectedIndex=0);
   document.getElementById('f_device').value='';
-  addedDevices=[]; renderDeviceTags(); setTodayDate();
+  addedDevices=[]; renderDeviceTags(); setTodayDate(); addedSizes=[]; renderSizeTags();
   pendingImages=[]; renderImgGrid();
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
   selectedTeach='';
@@ -833,7 +1275,11 @@ function renderCases() {
       ${c.devicespec?`<div class="case-device" style="color:#bbb">📐 ${c.devicespec}</div>`:''}
       ${c.hdd?`<div class="case-device">💾 ${c.hdd}${c.path?' › '+c.path:''}</div>`:''}
       ${tags.length?`<div class="case-tags">${tags.join('')}</div>`:''}
-      ${c.imageCount?`<div class="card-thumbs" id="thumbs_${c.ts}"><span style="font-size:11px;color:var(--muted);padding:4px 0">📷 ${c.imageCount} photo${c.imageCount>1?'s':''} · tap to view</span></div>`:''}
+      ${c.imageCount?`<div class="card-thumbs" id="thumbs_${c.ts}"><span style="font-size:11px;color:var(--muted);padding:4px 0">📷 loading…</span></div>`:''}
+      <div class="card-action-row">
+        <button class="btn-edit-case" onclick="openEditSheet('${c.ts}')">✏️ Edit</button>
+        <button class="btn-delete-case" onclick="promptDeleteCase('${c.ts}','${(c.pid||'').replace(/'/g,'')}')">🗑 Delete</button>
+      </div>
     </div>`;
   }).join('');
 
@@ -883,15 +1329,31 @@ function copyScript() {
     .then(()=>showToast('✅ Script copied!','success'))
     .catch(()=>showToast('Select and copy manually','error'));
 }
-function exportCSV() {
+async function exportCSV() {
   if (!cases.length) { showToast('No cases to export','error'); return; }
-  const h=['Timestamp','Patient ID','Age','Gender','Date','Indication','Procedure','Territory','Devices','Device Specs','Outcome','Complications','Teaching','HDD','Path','Notes'];
-  const rows=cases.map(c=>[c.ts,c.pid,c.age,c.gender,c.date,c.indication,c.proc,c.territory,c.devices,c.devicespec,c.outcome,c.comp,c.teach,c.hdd,c.path,c.notes]
-    .map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(','));
+  showToast('⏳ Preparing CSV…','');
+  const allIDB = await getAllImagesFromIDB();
+  // Build header — base cols + up to 8 image URL columns
+  const baseCols = ['Timestamp','Patient ID','Age','Gender','Date','Indication','Procedure',
+    'Territory','Devices','Device Sizes/Specs','Outcome','Complications','Teaching','HDD','Path','Notes'];
+  const imgCols = ['Image_1','Image_2','Image_3','Image_4','Image_5','Image_6','Image_7','Image_8'];
+  const h = [...baseCols, ...imgCols];
+  const rows = cases.map(c => {
+    const imgs = allIDB[c.ts] || [];
+    const base = [c.ts,c.pid,c.age,c.gender,c.date,c.indication,c.proc,c.territory,
+      c.devices,c.devicespec,c.outcome,c.comp,c.teach,c.hdd,c.path,c.notes]
+      .map(v => '"' + (v||'').replace(/"/g,'""') + '"');
+    // Embed image data URIs directly — Excel/Numbers ignores them but they're there for reference
+    // For practical viewing, note that data URIs in CSV don't render as images in Excel
+    // Use Export HTML instead for visual review
+    const imgFields = Array.from({length:8}, (_,i) => imgs[i] ? '"[image_' + (i+1) + '_embedded]"' : '""');
+    return [...base, ...imgFields].join(',');
+  });
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,'+encodeURIComponent([h.join(','),...rows].join('\n'));
-  a.download=`DSA_Cases_${new Date().toISOString().split('T')[0]}.csv`;
+  a.download='DSA_Cases_'+new Date().toISOString().split('T')[0]+'.csv';
   a.click();
+  showToast('✅ CSV exported (use Export HTML for images)','success');
 }
 
 
@@ -961,17 +1423,15 @@ async function deleteImagesFromIDB(caseId) {
 // ── Image grid (form) ────────────────────────────────────────────────────────
 function renderImgGrid() {
   const grid = document.getElementById('imgGrid');
-  document.getElementById('imgCount').textContent = pendingImages.length + ' / ' + MAX_IMGS + ' images';
+  document.getElementById('imgCount').textContent = pendingImages.length + ' photo' + (pendingImages.length !== 1 ? 's' : '') + ' added';
   let html = pendingImages.map((src, i) =>
     '<div class="img-thumb">' +
     '<img src="' + src + '" onclick="openLightboxLocal(' + i + ')">' +
     '<button class="img-del" onclick="removePendingImg(' + i + ')">×</button>' +
     '</div>'
   ).join('');
-  if (pendingImages.length < MAX_IMGS) {
-    html += '<div class="img-add-btn" onclick="triggerImgPick()">' +
-            '<span class="plus">＋</span><span>Photo</span></div>';
-  }
+  html += '<div class="img-add-btn" onclick="triggerImgPick()">' +
+          '<span class="plus">＋</span><span>Add</span></div>';
   grid.innerHTML = html;
   updateStorageBar();
 }
@@ -981,8 +1441,7 @@ function triggerImgPick() { document.getElementById('imgInput').click(); }
 
 function handleImgFiles(e) {
   const files = Array.from(e.target.files);
-  const remaining = MAX_IMGS - pendingImages.length;
-  const toAdd = files.slice(0, remaining);
+  const toAdd = files.slice(0, 50); // allow up to 50 per pick session
   let done = 0;
   if (!toAdd.length) return;
   toAdd.forEach(file => compressAndAdd(file, () => { done++; if (done===toAdd.length) renderImgGrid(); }));
