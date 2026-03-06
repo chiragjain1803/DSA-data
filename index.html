@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DSA Logger">
+<meta name="theme-color" content="#7B1818">
+<title>DSA Case Logger</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --crimson:    #7B1818;
+  --crimson-dk: #4A0E0E;
+  --crimson-lt: #C0392B;
+  --rose:       #F2CDCD;
+  --rose-lt:    #FBF0F0;
+  --gold:       #C8971A;
+  --gold-lt:    #FDF3DC;
+  --ink:        #1A1A1A;
+  --muted:      #6B6B6B;
+  --line:       #E5E0E0;
+  --surface:    #F9F5F5;
+  --green:      #1A7A4A;
+  --green-lt:   #DFF2EA;
+  --radius:     14px;
+  --safe-top:   env(safe-area-inset-top, 0px);
+  --safe-bot:   env(safe-area-inset-bottom, 0px);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:'DM Sans',sans-serif; background:var(--surface); color:var(--ink); min-height:100vh; overflow-x:hidden; }
+
+/* HEADER */
+.app-header { background:linear-gradient(160deg,var(--crimson-dk) 0%,var(--crimson) 60%,var(--crimson-lt) 100%); padding:calc(var(--safe-top) + 18px) 20px 20px; position:sticky; top:0; z-index:100; }
+.header-top { display:flex; justify-content:space-between; align-items:center; }
+.app-title { color:white; font-size:20px; font-weight:600; letter-spacing:-0.3px; }
+.app-sub { color:rgba(255,255,255,0.65); font-size:12px; margin-top:2px; }
+.header-badge { background:rgba(255,255,255,0.15); color:white; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:500; border:1px solid rgba(255,255,255,0.25); }
+
+/* TABS */
+.tabs { display:flex; background:var(--crimson-dk); border-top:1px solid rgba(255,255,255,0.1); }
+.tab { flex:1; padding:10px 0; text-align:center; color:rgba(255,255,255,0.5); font-size:12px; font-weight:500; cursor:pointer; transition:all 0.2s; border-bottom:2px solid transparent; }
+.tab.active { color:white; border-bottom-color:var(--gold); }
+.tab-icon { font-size:16px; display:block; margin-bottom:2px; }
+
+/* VIEWS */
+.view { display:none; padding:0 0 calc(var(--safe-bot) + 80px); }
+.view.active { display:block; }
+
+/* BANNER */
+.setup-banner { margin:16px; background:var(--gold-lt); border:1.5px solid var(--gold); border-radius:var(--radius); padding:14px 16px; cursor:pointer; }
+.setup-banner.connected { background:var(--green-lt); border-color:var(--green); }
+.setup-row { display:flex; align-items:center; gap:10px; }
+.setup-dot { width:8px; height:8px; border-radius:50%; background:var(--gold); flex-shrink:0; }
+.setup-dot.on { background:var(--green); }
+.setup-title { font-size:13px; font-weight:600; color:var(--gold); }
+.setup-title.on { color:var(--green); }
+.setup-desc { font-size:11px; color:var(--muted); margin-top:3px; line-height:1.5; }
+
+/* FORM SECTIONS */
+.form-section { margin:0 16px 8px; background:white; border-radius:var(--radius); overflow:visible; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.section-label { background:var(--rose); color:var(--crimson-dk); font-size:10px; font-weight:600; letter-spacing:1px; padding:7px 16px; text-transform:uppercase; border-radius:var(--radius) var(--radius) 0 0; }
+.field { border-bottom:1px solid var(--line); position:relative; }
+.field:last-child { border-bottom:none; }
+.field label { display:block; font-size:10px; font-weight:600; color:var(--muted); letter-spacing:0.5px; text-transform:uppercase; padding:10px 16px 0; }
+.field input, .field select, .field textarea { width:100%; border:none; outline:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:15px; color:var(--ink); padding:4px 16px 10px; appearance:none; -webkit-appearance:none; }
+.field textarea { resize:none; min-height:70px; }
+.field select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 16px center; padding-right:36px; }
+.field input:focus, .field select:focus, .field textarea:focus { background:var(--rose-lt); }
+
+/* SPLIT ROW (age + gender) */
+.field-row { display:flex; border-bottom:1px solid var(--line); }
+.field-row .field { flex:1; border-bottom:none; border-right:1px solid var(--line); }
+.field-row .field:last-child { border-right:none; }
+
+/* DATE FIELD */
+.date-field-wrap { position:relative; overflow:hidden; }
+.date-display { padding:4px 16px 10px; font-size:15px; color:var(--ink); display:flex; align-items:center; justify-content:space-between; }
+.date-display .cal-icon { font-size:16px; }
+input[type="date"].hidden-date { position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; font-size:16px; }
+
+/* DEVICE MULTI */
+.device-outer { border-radius:0 0 var(--radius) var(--radius); overflow:visible; position:relative; }
+.device-list { padding:10px 16px 6px; display:flex; flex-wrap:wrap; gap:6px; min-height:4px; }
+.device-tag { display:inline-flex; align-items:center; gap:5px; background:var(--rose-lt); border:1.5px solid var(--rose); border-radius:20px; padding:5px 8px 5px 12px; font-size:13px; font-weight:500; color:var(--crimson-dk); }
+.device-tag .x { width:18px; height:18px; border-radius:50%; background:var(--crimson); color:white; border:none; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; line-height:1; font-family:sans-serif; }
+.device-input-row { display:flex; border-top:1px solid var(--line); position:relative; }
+.device-input-row input { flex:1; border:none; outline:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--ink); padding:11px 14px; }
+.add-btn { padding:10px 16px; background:var(--crimson); color:white; border:none; font-size:14px; font-weight:700; cursor:pointer; border-radius:0 0 var(--radius) 0; flex-shrink:0; }
+.device-sugg { position:absolute; bottom:100%; left:0; right:0; z-index:500; background:white; border:1px solid var(--line); border-bottom:none; border-radius:var(--radius) var(--radius) 0 0; max-height:200px; overflow-y:auto; box-shadow:0 -4px 16px rgba(0,0,0,0.12); display:none; }
+.device-sugg.open { display:block; }
+.sugg-item { padding:11px 16px; font-size:14px; cursor:pointer; border-bottom:1px solid var(--line); }
+.sugg-item:active { background:var(--rose-lt); }
+.sugg-new { color:var(--crimson); font-weight:500; }
+.spec-row { padding:6px 16px 10px; border-top:1px solid var(--line); }
+.spec-row input { width:100%; border:none; outline:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--muted); }
+.spec-row input::placeholder { color:#ccc; }
+
+/* CHIPS */
+.chip-row { display:flex; flex-wrap:wrap; gap:8px; padding:8px 16px 12px; }
+.chip { padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500; border:1.5px solid var(--line); color:var(--muted); cursor:pointer; transition:all 0.15s; background:white; user-select:none; }
+.chip.selected { border-color:var(--crimson); color:var(--crimson); background:var(--rose-lt); }
+.chip-label { padding:10px 16px 4px; font-size:10px; font-weight:600; color:var(--muted); letter-spacing:0.5px; text-transform:uppercase; }
+
+/* SUBMIT */
+.submit-area { padding:16px; }
+.btn-submit { width:100%; padding:16px; border:none; border-radius:var(--radius); background:linear-gradient(135deg,var(--crimson) 0%,var(--crimson-lt) 100%); color:white; font-family:'DM Sans',sans-serif; font-size:16px; font-weight:600; cursor:pointer; box-shadow:0 4px 16px rgba(123,24,24,0.35); transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+.btn-submit:active { transform:scale(0.98); }
+.btn-submit.loading { opacity:0.7; pointer-events:none; }
+
+/* TOAST */
+.toast { position:fixed; bottom:calc(var(--safe-bot) + 90px); left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:white; padding:12px 22px; border-radius:24px; font-size:14px; font-weight:500; opacity:0; transition:all 0.3s; z-index:9999; white-space:nowrap; box-shadow:0 4px 20px rgba(0,0,0,0.25); }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.success { background:var(--green); }
+.toast.error { background:#C0392B; }
+
+/* CASE LIST */
+.list-header { padding:16px; display:flex; justify-content:space-between; align-items:center; }
+.list-title { font-size:17px; font-weight:600; }
+.list-count { font-size:12px; color:var(--muted); }
+.search-wrap { margin:0 16px 12px; position:relative; }
+.search-wrap input { width:100%; padding:11px 16px 11px 40px; border:1.5px solid var(--line); border-radius:12px; font-family:'DM Sans',sans-serif; font-size:14px; background:white; outline:none; }
+.search-wrap input:focus { border-color:var(--crimson); }
+.search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; color:var(--muted); }
+.case-card { margin:0 16px 10px; background:white; border-radius:var(--radius); padding:14px 16px; box-shadow:0 1px 4px rgba(0,0,0,0.06); border-left:3px solid var(--crimson); }
+.case-card.teaching { border-left-color:var(--gold); }
+.case-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px; }
+.case-pid { font-size:15px; font-weight:600; }
+.case-date { font-size:11px; color:var(--muted); font-family:'DM Mono',monospace; }
+.case-proc { font-size:13px; color:var(--crimson); font-weight:500; margin-bottom:4px; }
+.case-device { font-size:12px; color:var(--muted); margin-bottom:2px; }
+.case-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.tag { font-size:10px; font-weight:600; padding:3px 8px; border-radius:10px; }
+.tag-teach { background:var(--gold-lt); color:var(--gold); }
+.tag-outcome { background:var(--green-lt); color:var(--green); }
+.tag-comp { background:#FEE; color:#C0392B; }
+.empty-state { text-align:center; padding:60px 30px; color:var(--muted); }
+.empty-icon { font-size:48px; margin-bottom:12px; opacity:0.4; }
+
+/* IMAGE UPLOAD */
+.img-section { margin:0 16px 8px; background:white; border-radius:var(--radius); overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.img-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; padding:10px 12px 6px; }
+.img-thumb { position:relative; aspect-ratio:1; border-radius:8px; overflow:hidden; background:var(--surface); border:1.5px solid var(--line); cursor:pointer; }
+.img-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.img-thumb .img-del { position:absolute; top:3px; right:3px; width:20px; height:20px; border-radius:50%; background:rgba(0,0,0,0.65); color:white; border:none; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; }
+.img-add-btn { aspect-ratio:1; border-radius:8px; border:1.5px dashed var(--line); background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; color:var(--muted); gap:4px; font-size:11px; font-weight:500; }
+.img-add-btn .plus { font-size:22px; color:var(--crimson); line-height:1; }
+.img-caption { font-size:10px; color:var(--muted); padding:0 12px 8px; text-align:center; }
+.img-count { font-size:11px; color:var(--crimson); font-weight:600; padding:4px 12px 0; }
+/* LIGHTBOX */
+.lightbox { position:fixed; inset:0; background:rgba(0,0,0,0.93); z-index:9000; display:none; flex-direction:column; align-items:center; justify-content:center; }
+.lightbox.open { display:flex; }
+.lightbox img { max-width:95vw; max-height:80vh; object-fit:contain; border-radius:8px; }
+.lightbox-close { position:absolute; top:calc(var(--safe-top) + 16px); right:20px; color:white; font-size:28px; cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.1); border-radius:50%; border:none; }
+.lightbox-nav { display:flex; gap:20px; margin-top:16px; }
+.lightbox-nav button { background:rgba(255,255,255,0.15); color:white; border:none; padding:10px 24px; border-radius:24px; font-size:16px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+.lightbox-counter { color:rgba(255,255,255,0.6); font-size:13px; margin-top:8px; }
+/* CASE CARD thumbnails */
+.card-thumbs { display:flex; gap:5px; margin-top:8px; overflow-x:auto; padding-bottom:2px; }
+.card-thumb { width:52px; height:52px; border-radius:6px; object-fit:cover; flex-shrink:0; cursor:pointer; border:1.5px solid var(--line); }
+/* EXPORT HTML button */
+.btn-export-html { width:100%; padding:13px; border:none; border-radius:10px; background:var(--crimson-dk); color:white; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; margin-top:8px; }
+/* Storage warning */
+.storage-bar-wrap { margin:0 16px 8px; }
+.storage-bar-bg { background:var(--line); border-radius:4px; height:6px; overflow:hidden; }
+.storage-bar-fill { height:100%; background:var(--crimson); border-radius:4px; transition:width 0.4s; }
+.storage-label { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-bottom:4px; }
+
+
+/* SETUP */
+.setup-view { padding:16px; }
+.setup-card { background:white; border-radius:var(--radius); padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); margin-bottom:16px; }
+.setup-card h3 { font-size:15px; font-weight:600; margin-bottom:6px; color:var(--crimson-dk); }
+.setup-card p { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+.setup-step { display:flex; gap:12px; margin-bottom:14px; align-items:flex-start; }
+.step-num { width:26px; height:26px; border-radius:50%; background:var(--crimson); color:white; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.step-text { font-size:13px; color:var(--ink); line-height:1.6; }
+.url-field-wrap { display:flex; gap:8px; margin-top:12px; }
+.url-field-wrap input { flex:1; padding:11px 14px; border:1.5px solid var(--line); border-radius:10px; font-size:12px; font-family:'DM Mono',monospace; outline:none; }
+.url-field-wrap input:focus { border-color:var(--crimson); }
+.btn-save { padding:11px 18px; background:var(--crimson); color:white; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; white-space:nowrap; }
+.btn-clear { display:block; width:100%; margin-top:10px; padding:11px; border:1.5px solid var(--line); border-radius:10px; background:white; font-size:13px; color:var(--muted); cursor:pointer; font-family:'DM Sans',sans-serif; }
+.apps-script { background:var(--surface); border-radius:10px; padding:12px 14px; margin:10px 0; font-family:'DM Mono',monospace; font-size:10px; color:#333; line-height:1.7; overflow-x:auto; border:1px solid var(--line); white-space:pre; max-height:200px; overflow-y:auto; }
+.copy-btn { display:inline-flex; align-items:center; gap:5px; padding:7px 14px; background:var(--surface); border:1.5px solid var(--line); border-radius:8px; font-size:12px; color:var(--muted); cursor:pointer; font-family:'DM Sans',sans-serif; margin-top:6px; }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-top">
+    <div>
+      <div class="app-title">🩻 DSA Logger</div>
+      <div class="app-sub">Neuro Interventional Case Log</div>
+    </div>
+    <div class="header-badge" id="syncBadge">⚡ Local</div>
+  </div>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('entry')"><span class="tab-icon">✏️</span>New Case</div>
+  <div class="tab" onclick="switchTab('cases')"><span class="tab-icon">📋</span>My Cases</div>
+  <div class="tab" onclick="switchTab('setup')"><span class="tab-icon">⚙️</span>Setup</div>
+</div>
+
+<!-- ══════════════ TAB 1: ENTRY ══════════════ -->
+<div class="view active" id="view-entry">
+
+  <div class="setup-banner" id="entryBanner" onclick="switchTab('setup')">
+    <div class="setup-row">
+      <div class="setup-dot" id="bannerDot"></div>
+      <div>
+        <div class="setup-title" id="bannerTitle">Google Sheets not connected</div>
+        <div class="setup-desc" id="bannerDesc">Cases saved locally only · Tap to connect</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATIENT INFO -->
+  <div class="form-section">
+    <div class="section-label">Patient Info</div>
+    <div class="field">
+      <label>Patient ID / MRN</label>
+      <input type="text" id="f_pid" placeholder="e.g. PT0045" autocomplete="off" autocorrect="off" autocapitalize="characters">
+    </div>
+    <!-- Date with calendar picker -->
+    <div class="field date-field-wrap">
+      <label>Date of Procedure</label>
+      <div class="date-display">
+        <span id="dateText" style="font-size:15px"></span>
+        <span class="cal-icon">📅</span>
+      </div>
+      <input type="date" id="f_date" class="hidden-date" oninput="updateDateDisplay()">
+    </div>
+    <!-- Age + Gender on same row -->
+    <div class="field-row">
+      <div class="field">
+        <label>Age (years)</label>
+        <input type="number" id="f_age" placeholder="52" min="0" max="120" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>Gender</label>
+        <select id="f_gender">
+          <option value="">—</option>
+          <option value="M">Male</option>
+          <option value="F">Female</option>
+          <option value="O">Other</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROCEDURE -->
+  <div class="form-section">
+    <div class="section-label">Procedure</div>
+    <div class="field">
+      <label>Indication</label>
+      <select id="f_indication">
+        <option value="">Select…</option>
+        <option>Cerebral Aneurysm – Unruptured</option>
+        <option>Cerebral Aneurysm – Ruptured (SAH)</option>
+        <option>Cerebral AVM</option>
+        <option>Dural AV Fistula (DAVF)</option>
+        <option>Carotid Stenosis</option>
+        <option>Acute Ischaemic Stroke</option>
+        <option>Cerebral Venous Sinus Thrombosis</option>
+        <option>Intracranial Tumour Embolisation</option>
+        <option>Epistaxis</option>
+        <option>Head &amp; Neck Vascular Malformation</option>
+        <option>Spinal AVM / DAVF</option>
+        <option>Traumatic Vascular Injury</option>
+        <option>Diagnostic Only</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Procedure Type</label>
+      <select id="f_proc">
+        <option value="">Select…</option>
+        <option>Cerebral DSA – Diagnostic</option>
+        <option>Cerebral DSA – Interventional</option>
+        <option>Intracranial Aneurysm Coiling</option>
+        <option>Flow Diverter Placement</option>
+        <option>AVM Embolisation</option>
+        <option>DAVF Embolisation</option>
+        <option>Carotid Artery Stenting (CAS)</option>
+        <option>Mechanical Thrombectomy</option>
+        <option>Intra-arterial Thrombolysis</option>
+        <option>Tumour Embolisation</option>
+        <option>Epistaxis Embolisation</option>
+        <option>Balloon Test Occlusion (BTO)</option>
+        <option>Venous Sinus Stenting</option>
+        <option>Spinal DSA</option>
+        <option>Spinal AVM / DAVF Embolisation</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Territory / Vessel</label>
+      <select id="f_territory">
+        <option value="">Select…</option>
+        <optgroup label="— Internal Carotid —">
+          <option>Right ICA</option>
+          <option>Left ICA</option>
+        </optgroup>
+        <optgroup label="— Anterior Circulation —">
+          <option>Right MCA (M1)</option>
+          <option>Right MCA (M2)</option>
+          <option>Left MCA (M1)</option>
+          <option>Left MCA (M2)</option>
+          <option>Right ACA</option>
+          <option>Left ACA</option>
+          <option>ACOM (Anterior Communicating Artery)</option>
+        </optgroup>
+        <optgroup label="— Communicating Arteries —">
+          <option>Right PCOM</option>
+          <option>Left PCOM</option>
+        </optgroup>
+        <optgroup label="— Posterior Circulation —">
+          <option>Basilar Artery</option>
+          <option>Right PCA</option>
+          <option>Left PCA</option>
+          <option>Right Vertebral Artery</option>
+          <option>Left Vertebral Artery</option>
+          <option>PICA (Right)</option>
+          <option>PICA (Left)</option>
+          <option>AICA (Right)</option>
+          <option>AICA (Left)</option>
+          <option>SCA (Right)</option>
+          <option>SCA (Left)</option>
+        </optgroup>
+        <optgroup label="— Other Intracranial —">
+          <option>Ophthalmic Artery (Right)</option>
+          <option>Ophthalmic Artery (Left)</option>
+          <option>Anterior Choroidal (Right)</option>
+          <option>Anterior Choroidal (Left)</option>
+          <option>Lenticulostriate Arteries</option>
+          <option>Dural Sinuses / Venous</option>
+        </optgroup>
+        <optgroup label="— Extracranial / Cervical —">
+          <option>Right CCA</option>
+          <option>Left CCA</option>
+          <option>Right ECA</option>
+          <option>Left ECA</option>
+          <option>Right Subclavian</option>
+          <option>Left Subclavian</option>
+        </optgroup>
+        <optgroup label="— Spinal —">
+          <option>Cervical Spinal Vessels</option>
+          <option>Thoracic Spinal Vessels</option>
+          <option>Lumbar Spinal Vessels</option>
+          <option>Artery of Adamkiewicz</option>
+        </optgroup>
+      </select>
+    </div>
+  </div>
+
+  <!-- DEVICES — MULTIPLE with autocomplete -->
+  <div class="form-section">
+    <div class="section-label">Devices Used — Add Multiple</div>
+    <div class="device-outer">
+      <div class="device-list" id="deviceList">
+        <span style="font-size:12px;color:#ccc;padding:2px 0">No devices added yet</span>
+      </div>
+      <div style="position:relative">
+        <div class="device-sugg" id="deviceSugg"></div>
+        <div class="device-input-row">
+          <input type="text" id="f_device"
+            placeholder="Search or type any device…"
+            autocomplete="off" autocorrect="off"
+            oninput="deviceInput()"
+            onfocus="deviceInput()"
+            onblur="hideDeviceSuggsDelayed()"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();addDevice();}">
+          <button class="add-btn" onclick="addDevice()">＋</button>
+        </div>
+      </div>
+      <div class="spec-row">
+        <input type="text" id="f_devicespec"
+          placeholder="Sizes / specs for all devices (e.g. PED 3.5×20mm, Coils 3×8cm)…"
+          autocorrect="off">
+      </div>
+    </div>
+  </div>
+
+  <!-- OUTCOME -->
+  <div class="form-section">
+    <div class="section-label">Outcome</div>
+    <div class="field">
+      <label>Procedural Outcome</label>
+      <select id="f_outcome">
+        <option value="">Select…</option>
+        <option>Complete Occlusion (Raymond I)</option>
+        <option>Near-Complete (Raymond II)</option>
+        <option>Partial Occlusion (Raymond III)</option>
+        <option>Technical Success</option>
+        <option>Recanalization</option>
+        <option>Diagnostic Only – No Intervention</option>
+        <option>Abandoned / Incomplete</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Complications</label>
+      <select id="f_comp">
+        <option value="">None</option>
+        <option>Vasospasm</option>
+        <option>Thromboembolic Event</option>
+        <option>Intra-procedural Rupture</option>
+        <option>Coil Herniation / Migration</option>
+        <option>Access Site Haematoma</option>
+        <option>Contrast Reaction</option>
+        <option>Neurological Deficit – Transient</option>
+        <option>Neurological Deficit – Permanent</option>
+        <option>Death</option>
+        <option>Other (see notes)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- CLASSIFICATION -->
+  <div class="form-section">
+    <div class="section-label">Classification &amp; Storage</div>
+    <div class="chip-label">Teaching Case?</div>
+    <div class="chip-row" id="teachChips">
+      <div class="chip" onclick="toggleChip(this)">Not Teaching</div>
+      <div class="chip" onclick="toggleChip(this)">Teaching ⭐</div>
+      <div class="chip" onclick="toggleChip(this)">Conference 🎤</div>
+      <div class="chip" onclick="toggleChip(this)">Publication 📄</div>
+    </div>
+    <div class="field">
+      <label>HDD Label</label>
+      <select id="f_hdd">
+        <option value="">Select…</option>
+        <option>HDD1</option><option>HDD2</option><option>HDD3</option>
+        <option>HDD4</option><option>HDD5</option><option>NAS</option><option>Cloud</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Folder Path (optional)</label>
+      <input type="text" id="f_path" placeholder="HDD2/2024-03/PT0045_PED_ICA" autocorrect="off" autocapitalize="none">
+    </div>
+    <div class="field">
+      <label>Notes / Key Findings</label>
+      <textarea id="f_notes" placeholder="Aneurysm size, morphology, neck width, treatment details, follow-up plan…"></textarea>
+    </div>
+  </div>
+
+  <!-- IMAGES -->
+  <div class="img-section">
+    <div class="section-label" style="border-radius:var(--radius) var(--radius) 0 0">Case Images (up to 8) — Tap to add from camera or library</div>
+    <div class="img-count" id="imgCount">0 / 8 images</div>
+    <div class="img-grid" id="imgGrid"></div>
+    <div class="img-caption">Images are compressed &amp; stored locally · Export as HTML to view on laptop</div>
+    <input type="file" id="imgInput" accept="image/*" multiple style="display:none" onchange="handleImgFiles(event)">
+  </div>
+  <!-- STORAGE BAR -->
+  <div class="storage-bar-wrap">
+    <div class="storage-label"><span>📦 Local storage used</span><span id="storageUsed">—</span></div>
+    <div class="storage-bar-bg"><div class="storage-bar-fill" id="storageBar" style="width:0%"></div></div>
+  </div>
+
+  <div class="submit-area">
+    <button class="btn-submit" id="submitBtn" onclick="submitCase()">
+      <span>💾</span> Save Case
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════ TAB 2: CASES ══════════════ -->
+<div class="view" id="view-cases">
+  <div class="list-header">
+    <div class="list-title">Logged Cases</div>
+    <div class="list-count" id="caseCount">0 cases</div>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search by patient, device, vessel…" oninput="renderCases()">
+  </div>
+  <div id="caseList"></div>
+</div>
+
+<!-- ══════════════ TAB 3: SETUP ══════════════ -->
+<div class="view" id="view-setup">
+  <div class="setup-view">
+
+    <div class="setup-card">
+      <h3>📱 Add to iPhone Home Screen</h3>
+      <p>Open in <strong>Safari</strong> → tap <strong>Share</strong> (box+arrow) → <strong>Add to Home Screen</strong> → <strong>Add</strong>. The DSA Logger icon will appear on your home screen and work like a native app.</p>
+    </div>
+
+    <div class="setup-card">
+      <h3>🔗 Connect to Google Sheets</h3>
+      <p>Do this once. After setup, every case syncs instantly to your Sheet.</p>
+      <div class="setup-step"><div class="step-num">1</div><div class="step-text">Go to <strong>sheets.google.com</strong> → create a new sheet called <strong>DSA Cases</strong></div></div>
+      <div class="setup-step"><div class="step-num">2</div><div class="step-text">Click <strong>Extensions → Apps Script</strong></div></div>
+      <div class="setup-step"><div class="step-num">3</div><div class="step-text">Delete existing code and paste the script below, then click <strong>Save</strong></div></div>
+
+      <div class="apps-script" id="scriptBlock">function doPost(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Sheet1") || ss.getSheets()[0];
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow([
+      "Timestamp","Patient ID","Age","Gender","Date",
+      "Indication","Procedure","Territory",
+      "Devices","Device Specs","Outcome",
+      "Complications","Teaching","HDD","Path","Notes"
+    ]);
+  }
+  var d = JSON.parse(e.postData.contents);
+  sheet.appendRow([
+    new Date().toLocaleString(),
+    d.pid, d.age, d.gender, d.date,
+    d.indication, d.proc, d.territory,
+    d.devices, d.devicespec, d.outcome,
+    d.comp, d.teach, d.hdd, d.path, d.notes
+  ]);
+  return ContentService
+    .createTextOutput(JSON.stringify({status:"ok"}))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+function doGet(e) {
+  return ContentService
+    .createTextOutput("DSA Logger OK")
+    .setMimeType(ContentService.MimeType.TEXT);
+}</div>
+      <button class="copy-btn" onclick="copyScript()">📋 Copy Script</button>
+
+      <div class="setup-step" style="margin-top:14px"><div class="step-num">4</div><div class="step-text">Click <strong>Deploy → New Deployment</strong><br>Type: <strong>Web App</strong> · Who has access: <strong>Anyone</strong><br>Click <strong>Deploy</strong> → copy the Web App URL shown</div></div>
+      <div class="setup-step"><div class="step-num">5</div><div class="step-text">Paste the URL here and tap Save:</div></div>
+      <div class="url-field-wrap">
+        <input type="url" id="webhookUrl" placeholder="https://script.google.com/macros/s/…">
+        <button class="btn-save" onclick="saveWebhook()">Save</button>
+      </div>
+      <button class="btn-clear" onclick="clearWebhook()">🗑 Disconnect</button>
+    </div>
+
+    <div class="setup-card">
+      <h3>📤 Export All Cases as CSV</h3>
+      <p>Download everything stored locally — import into Excel or Google Sheets anytime.</p>
+      <button class="btn-save" style="width:100%;padding:13px;border-radius:10px" onclick="exportCSV()">⬇️ Download CSV</button>
+      <button class="btn-export-html" onclick="exportHTML()">📄 Export Cases + Images (HTML)</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightboxImg" src="" alt="">
+  <div class="lightbox-nav">
+    <button onclick="lbNav(-1);event.stopPropagation()">&#8592; Prev</button>
+    <button onclick="lbNav(1);event.stopPropagation()">Next &#8594;</button>
+  </div>
+  <div class="lightbox-counter" id="lbCounter"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STORAGE KEYS ──────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'dsa_cases_v4';
+const WEBHOOK_KEY = 'dsa_webhook_url';
+const DEVICES_KEY = 'dsa_custom_devices_v2';
+
+// ── DEVICE LIBRARY ────────────────────────────────────────────────────────────
+const DEFAULT_DEVICES = [
+  "Pipeline Embolization Device (PED)",
+  "Pipeline Flex",
+  "Coils – GDC (Boston Scientific)",
+  "Coils – HydroCoil (MicroVention)",
+  "Coils – ULTIPAQ (MicroVention)",
+  "Coils – Axium (Medtronic)",
+  "Coils – Target (Stryker)",
+  "Coils – DELTA (Stryker)",
+  "Coils – Microplex (MicroVention)",
+  "WEB Device (Woven EndoBridge)",
+  "Stent – Neuroform Atlas",
+  "Stent – Enterprise 2",
+  "Stent – LVIS Jr",
+  "Stent – LVIS",
+  "Stent – Leo+",
+  "Stent – Wingspan",
+  "Flow Diverter – Surpass Evolve",
+  "Flow Diverter – p64",
+  "Flow Diverter – Fred Jr",
+  "Onyx-18",
+  "Onyx-34",
+  "Onyx-500",
+  "NBCA Glue (Histoacryl / Trufill)",
+  "SQUID 12",
+  "SQUID 18",
+  "PHIL (Precipitating Hydrophobic Injectable Liquid)",
+  "Balloon – HyperGlide",
+  "Balloon – HyperForm",
+  "Balloon – Transform",
+  "Balloon-Guide Catheter (BGC)",
+  "Aspiration Catheter – ACE60",
+  "Aspiration Catheter – ACE68",
+  "Aspiration Catheter – ACE72",
+  "Penumbra System",
+  "Solitaire Stent Retriever",
+  "Trevo Stent Retriever",
+  "EmboTrap",
+  "pRESET Thrombectomy Device",
+  "No Device / Diagnostic Only",
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let cases = [], customDevices = [], allDevices = [], addedDevices = [], selectedTeach = '';
+
+try { cases = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) {}
+try { customDevices = JSON.parse(localStorage.getItem(DEVICES_KEY) || '[]'); } catch(e) {}
+allDevices = [...DEFAULT_DEVICES, ...customDevices];
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  setTodayDate();
+  loadWebhookUI();
+  renderCases();
+  renderImgGrid();
+});
+
+function setTodayDate() {
+  const t = new Date();
+  const v = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+  document.getElementById('f_date').value = v;
+  updateDateDisplay();
+}
+
+function updateDateDisplay() {
+  const v = document.getElementById('f_date').value;
+  if (!v) { document.getElementById('dateText').textContent = 'Tap to select'; return; }
+  const [yr,mo,dy] = v.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('dateText').textContent = `${parseInt(dy)} ${months[parseInt(mo)-1]} ${yr}`;
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  ['entry','cases','setup'].forEach((n,i) => {
+    document.querySelectorAll('.tab')[i].classList.toggle('active', n===tab);
+  });
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-'+tab).classList.add('active');
+  if (tab==='cases') renderCases();
+}
+
+// ── DEVICES ───────────────────────────────────────────────────────────────────
+function deviceInput() {
+  const raw = document.getElementById('f_device').value;
+  const val = raw.toLowerCase().trim();
+  const box = document.getElementById('deviceSugg');
+  if (!val) { box.classList.remove('open'); return; }
+
+  const matched = allDevices.filter(d => d.toLowerCase().includes(val) && !addedDevices.includes(d));
+  const exactMatch = allDevices.some(d => d.toLowerCase() === val);
+
+  // Use global lookup to safely pass device strings to onclick without escaping issues
+  window._dsugg = [];
+
+  let html = matched.slice(0,9).map(d => {
+    const safe = d.replace(/</g,'&lt;');
+    const re = new RegExp(val.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi');
+    const hi = safe.replace(re, m => `<strong>${m}</strong>`);
+    const idx = window._dsugg.push(d) - 1;
+    return `<div class="sugg-item" onmousedown="pickDevice(window._dsugg[${idx}])">${hi}</div>`;
+  }).join('');
+
+  if (!exactMatch && raw.trim().length > 1) {
+    const typed = raw.trim();
+    const idx = window._dsugg.push(typed) - 1;
+    html += `<div class="sugg-item sugg-new" onmousedown="pickDevice(window._dsugg[${idx}])">+ Add as new device: ${typed.replace(/</g,'&lt;')}</div>`;
+  }
+
+  box.innerHTML = html || '<div class="sugg-item" style="color:#ccc">Type to search…</div>';
+  box.classList.add('open');
+}
+
+function pickDevice(val) {
+  document.getElementById('f_device').value = val;
+  document.getElementById('deviceSugg').classList.remove('open');
+  addDevice();
+}
+
+function addDevice() {
+  const inp = document.getElementById('f_device');
+  const val = inp.value.trim();
+  if (!val) return;
+  if (addedDevices.includes(val)) { showToast('Already in list', ''); inp.value=''; return; }
+  if (!allDevices.includes(val)) {
+    customDevices.push(val);
+    allDevices.push(val);
+    try { localStorage.setItem(DEVICES_KEY, JSON.stringify(customDevices)); } catch(e) {}
+  }
+  addedDevices.push(val);
+  renderDeviceTags();
+  inp.value = '';
+  document.getElementById('deviceSugg').classList.remove('open');
+  inp.focus();
+}
+
+function removeDevice(i) { addedDevices.splice(i,1); renderDeviceTags(); }
+
+function renderDeviceTags() {
+  const list = document.getElementById('deviceList');
+  if (!addedDevices.length) {
+    list.innerHTML = '<span style="font-size:12px;color:#ccc;padding:2px 0">No devices added yet</span>';
+    return;
+  }
+  list.innerHTML = addedDevices.map((d,i) =>
+    `<div class="device-tag">${d}<button class="x" onclick="removeDevice(${i})">×</button></div>`
+  ).join('');
+}
+
+function hideDeviceSuggsDelayed() {
+  setTimeout(() => document.getElementById('deviceSugg').classList.remove('open'), 200);
+}
+
+// ── CHIPS ─────────────────────────────────────────────────────────────────────
+function toggleChip(el) {
+  document.querySelectorAll('#teachChips .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedTeach = el.textContent.trim();
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────────
+async function submitCase() {
+  const pid  = document.getElementById('f_pid').value.trim();
+  const date = document.getElementById('f_date').value;
+  if (!pid)  { showToast('Enter a Patient ID', 'error'); return; }
+  if (!date) { showToast('Select a date', 'error'); return; }
+
+  const row = {
+    pid, date,
+    age:        document.getElementById('f_age').value.trim(),
+    gender:     document.getElementById('f_gender').value,
+    indication: document.getElementById('f_indication').value,
+    proc:       document.getElementById('f_proc').value,
+    territory:  document.getElementById('f_territory').value,
+    devices:    addedDevices.join(' | '),
+    deviceArr:  [...addedDevices],
+    devicespec: document.getElementById('f_devicespec').value.trim(),
+    outcome:    document.getElementById('f_outcome').value,
+    comp:       document.getElementById('f_comp').value,
+    teach:      selectedTeach,
+    hdd:        document.getElementById('f_hdd').value,
+    path:       document.getElementById('f_path').value.trim(),
+    notes:      document.getElementById('f_notes').value.trim(),
+    ts:         new Date().toISOString(),
+    synced:     false,
+    imageCount: pendingImages.length,
+  };
+
+  cases.unshift(row);
+  // Save case metadata (no images) to localStorage
+  const casesForLS = cases.map(c => { const x={...c}; delete x.images; return x; });
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(casesForLS)); } catch(e) {}
+  // Save images to IndexedDB separately
+  if (pendingImages.length) saveImagesToIDB(row.ts, [...pendingImages]);
+
+  const webhook = localStorage.getItem(WEBHOOK_KEY);
+  const btn = document.getElementById('submitBtn');
+  btn.classList.add('loading'); btn.innerHTML = '<span>⏳</span> Saving…';
+
+  if (webhook) {
+    try {
+      await fetch(webhook, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(row) });
+      cases[0].synced = true;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cases)); } catch(e) {}
+      showToast('✅ Saved to Google Sheets!', 'success');
+    } catch(e) {
+      showToast('📱 Saved locally (Sheets offline)', '');
+    }
+  } else {
+    showToast('📱 Saved locally', '');
+  }
+
+  btn.classList.remove('loading'); btn.innerHTML = '<span>💾</span> Save Case';
+  resetForm();
+}
+
+function resetForm() {
+  ['f_pid','f_age','f_devicespec','f_path','f_notes'].forEach(id => document.getElementById(id).value='');
+  ['f_gender','f_indication','f_proc','f_territory','f_outcome','f_comp','f_hdd'].forEach(id => document.getElementById(id).selectedIndex=0);
+  document.getElementById('f_device').value='';
+  addedDevices=[]; renderDeviceTags(); setTodayDate();
+  pendingImages=[]; renderImgGrid();
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+  selectedTeach='';
+}
+
+// ── CASES LIST ────────────────────────────────────────────────────────────────
+function renderCases() {
+  const q = (document.getElementById('searchInput')?.value||'').toLowerCase();
+  const filtered = cases.filter(c => !q || [c.pid,c.proc,c.devices,c.indication,c.territory,c.notes,c.outcome,c.gender]
+    .some(v=>(v||'').toLowerCase().includes(q)));
+
+  document.getElementById('caseCount').textContent = `${filtered.length} case${filtered.length!==1?'s':''}`;
+
+  if (!filtered.length) {
+    document.getElementById('caseList').innerHTML =
+      `<div class="empty-state"><div class="empty-icon">🩻</div><div>${cases.length?'No cases match':'No cases logged yet'}</div></div>`;
+    return;
+  }
+
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function fmtDate(v) {
+    if (!v) return '';
+    const [yr,mo,dy]=v.split('-');
+    return `${parseInt(dy)} ${months[parseInt(mo)-1]} ${yr}`;
+  }
+
+  // Pre-init IDB
+  openIDB();
+  document.getElementById('caseList').innerHTML = filtered.map(c => {
+    const isTeach = c.teach && c.teach!=='Not Teaching';
+    const tags=[];
+    if (c.outcome) tags.push(`<span class="tag tag-outcome">${c.outcome}</span>`);
+    if (c.comp && c.comp!=='None') tags.push(`<span class="tag tag-comp">⚠️ ${c.comp}</span>`);
+    if (isTeach) tags.push(`<span class="tag tag-teach">${c.teach}</span>`);
+    if (c.synced) tags.push(`<span class="tag" style="background:#e8f4fd;color:#1a6b9a">☁️ Synced</span>`);
+
+    const demo = [c.age?(c.age+'y'):'', c.gender].filter(Boolean).join('/');
+    const devList = (c.deviceArr?.length ? c.deviceArr : (c.devices?c.devices.split(' | '):[]));
+    const devHtml = devList.map(d=>`<div class="case-device">🔧 ${d}</div>`).join('');
+
+    return `<div class="case-card ${isTeach?'teaching':''}">
+      <div class="case-top">
+        <div class="case-pid">${c.pid||'—'}${demo?` <span style="font-weight:400;font-size:12px;color:var(--muted)">${demo}</span>`:''}</div>
+        <div class="case-date">${fmtDate(c.date)}</div>
+      </div>
+      <div class="case-proc">${[c.proc,c.territory].filter(Boolean).join(' · ')||'Procedure not set'}</div>
+      ${devHtml}
+      ${c.devicespec?`<div class="case-device" style="color:#bbb">📐 ${c.devicespec}</div>`:''}
+      ${c.hdd?`<div class="case-device">💾 ${c.hdd}${c.path?' › '+c.path:''}</div>`:''}
+      ${tags.length?`<div class="case-tags">${tags.join('')}</div>`:''}
+      ${c.imageCount?`<div class="card-thumbs" id="thumbs_${c.ts}"><span style="font-size:11px;color:var(--muted);padding:4px 0">📷 ${c.imageCount} photo${c.imageCount>1?'s':''} · tap to view</span></div>`:''}
+    </div>`;
+  }).join('');
+
+  // Load thumbnails from IDB for each case that has images
+  filtered.forEach(c => {
+    if (c.imageCount && c.ts) {
+      loadImagesFromIDB(c.ts).then(imgs => {
+        const el = document.getElementById('thumbs_' + c.ts);
+        if (!el || !imgs.length) return;
+        const ts = c.ts;
+        el.innerHTML = imgs.map((src, ii) => {
+          const attr = 'openLightboxCase("' + ts + '",' + ii + ')';
+          return '<img class="card-thumb" src="' + src + '" onclick="' + attr + '">';
+        }).join('');
+      });
+    }
+  });
+}
+
+// ── SETUP ─────────────────────────────────────────────────────────────────────
+function loadWebhookUI() {
+  const url = localStorage.getItem(WEBHOOK_KEY);
+  if (!url) return;
+  document.getElementById('webhookUrl').value = url;
+  document.getElementById('syncBadge').textContent = '☁️ Sheets On';
+  document.getElementById('syncBadge').style.background = 'rgba(26,122,74,0.35)';
+  document.getElementById('bannerDot').classList.add('on');
+  const t = document.getElementById('bannerTitle');
+  t.textContent = 'Google Sheets connected ✅'; t.classList.add('on');
+  document.getElementById('bannerDesc').textContent = 'Cases sync automatically';
+  document.getElementById('entryBanner').classList.add('connected');
+}
+function saveWebhook() {
+  const url = document.getElementById('webhookUrl').value.trim();
+  if (!url.startsWith('https://')) { showToast('Enter a valid https:// URL','error'); return; }
+  localStorage.setItem(WEBHOOK_KEY, url);
+  showToast('✅ Google Sheets connected!','success');
+  loadWebhookUI();
+}
+function clearWebhook() {
+  localStorage.removeItem(WEBHOOK_KEY);
+  document.getElementById('webhookUrl').value='';
+  showToast('Disconnected','');
+}
+function copyScript() {
+  navigator.clipboard.writeText(document.getElementById('scriptBlock').textContent)
+    .then(()=>showToast('✅ Script copied!','success'))
+    .catch(()=>showToast('Select and copy manually','error'));
+}
+function exportCSV() {
+  if (!cases.length) { showToast('No cases to export','error'); return; }
+  const h=['Timestamp','Patient ID','Age','Gender','Date','Indication','Procedure','Territory','Devices','Device Specs','Outcome','Complications','Teaching','HDD','Path','Notes'];
+  const rows=cases.map(c=>[c.ts,c.pid,c.age,c.gender,c.date,c.indication,c.proc,c.territory,c.devices,c.devicespec,c.outcome,c.comp,c.teach,c.hdd,c.path,c.notes]
+    .map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(','));
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent([h.join(','),...rows].join('\n'));
+  a.download=`DSA_Cases_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+}
+
+
+// ── IMAGES — IndexedDB storage ───────────────────────────────────────────────
+let pendingImages = [];   // compressed base64 for current unsaved form
+let lbImages = [], lbIdx = 0;
+const MAX_IMGS = 8;
+const IMG_MAX_PX = 1000;  // max dimension — good balance of quality vs size
+const IMG_QUALITY = 0.75; // JPEG quality — ~60-120KB per image after compression
+
+// ── IndexedDB setup ──────────────────────────────────────────────────────────
+let idb = null;
+function openIDB() {
+  return new Promise((res, rej) => {
+    if (idb) { res(idb); return; }
+    const req = indexedDB.open('DSA_Images', 1);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore('images', { keyPath: 'caseId' });
+    };
+    req.onsuccess = e => { idb = e.target.result; res(idb); };
+    req.onerror = () => rej('IDB open failed');
+  });
+}
+
+async function saveImagesToIDB(caseId, imgs) {
+  try {
+    const db = await openIDB();
+    const tx = db.transaction('images', 'readwrite');
+    tx.objectStore('images').put({ caseId, imgs });
+  } catch(e) { console.warn('IDB save error', e); }
+}
+
+async function loadImagesFromIDB(caseId) {
+  try {
+    const db = await openIDB();
+    return new Promise((res) => {
+      const req = db.transaction('images','readonly').objectStore('images').get(caseId);
+      req.onsuccess = e => res(e.target.result ? e.target.result.imgs : []);
+      req.onerror = () => res([]);
+    });
+  } catch(e) { return []; }
+}
+
+async function getAllImagesFromIDB() {
+  try {
+    const db = await openIDB();
+    return new Promise((res) => {
+      const all = {};
+      const req = db.transaction('images','readonly').objectStore('images').openCursor();
+      req.onsuccess = e => {
+        const cur = e.target.result;
+        if (cur) { all[cur.value.caseId] = cur.value.imgs; cur.continue(); }
+        else res(all);
+      };
+      req.onerror = () => res({});
+    });
+  } catch(e) { return {}; }
+}
+
+async function deleteImagesFromIDB(caseId) {
+  try {
+    const db = await openIDB();
+    db.transaction('images','readwrite').objectStore('images').delete(caseId);
+  } catch(e) {}
+}
+
+// ── Image grid (form) ────────────────────────────────────────────────────────
+function renderImgGrid() {
+  const grid = document.getElementById('imgGrid');
+  document.getElementById('imgCount').textContent = pendingImages.length + ' / ' + MAX_IMGS + ' images';
+  let html = pendingImages.map((src, i) =>
+    '<div class="img-thumb">' +
+    '<img src="' + src + '" onclick="openLightboxLocal(' + i + ')">' +
+    '<button class="img-del" onclick="removePendingImg(' + i + ')">×</button>' +
+    '</div>'
+  ).join('');
+  if (pendingImages.length < MAX_IMGS) {
+    html += '<div class="img-add-btn" onclick="triggerImgPick()">' +
+            '<span class="plus">＋</span><span>Photo</span></div>';
+  }
+  grid.innerHTML = html;
+  updateStorageBar();
+}
+
+function removePendingImg(i) { pendingImages.splice(i,1); renderImgGrid(); }
+function triggerImgPick() { document.getElementById('imgInput').click(); }
+
+function handleImgFiles(e) {
+  const files = Array.from(e.target.files);
+  const remaining = MAX_IMGS - pendingImages.length;
+  const toAdd = files.slice(0, remaining);
+  let done = 0;
+  if (!toAdd.length) return;
+  toAdd.forEach(file => compressAndAdd(file, () => { done++; if (done===toAdd.length) renderImgGrid(); }));
+  e.target.value = '';
+}
+
+function compressAndAdd(file, cb) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > IMG_MAX_PX || h > IMG_MAX_PX) {
+        if (w > h) { h = Math.round(h * IMG_MAX_PX / w); w = IMG_MAX_PX; }
+        else { w = Math.round(w * IMG_MAX_PX / h); h = IMG_MAX_PX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', IMG_QUALITY);
+      const kb = Math.round(compressed.length * 0.75 / 1024);
+      pendingImages.push(compressed);
+      if (cb) cb();
+      showToast('📸 Added (' + kb + ' KB)', '');
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Lightbox ─────────────────────────────────────────────────────────────────
+function openLightboxLocal(idx) {
+  lbImages = pendingImages; lbIdx = idx; showLightbox();
+}
+
+async function openLightboxCase(caseTs, imgIdx) {
+  lbImages = await loadImagesFromIDB(caseTs);
+  lbIdx = imgIdx;
+  showLightbox();
+}
+
+function showLightbox() {
+  if (!lbImages.length) return;
+  document.getElementById('lightboxImg').src = lbImages[lbIdx];
+  document.getElementById('lbCounter').textContent = (lbIdx+1) + ' / ' + lbImages.length;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function closeLightbox(e) {
+  if (!e || e.target===document.getElementById('lightbox') || e.target.classList.contains('lightbox-close'))
+    document.getElementById('lightbox').classList.remove('open');
+}
+
+function lbNav(dir) {
+  lbIdx = (lbIdx + dir + lbImages.length) % lbImages.length;
+  showLightbox();
+}
+
+// ── Storage bar (estimates IDB usage) ────────────────────────────────────────
+async function updateStorageBar() {
+  try {
+    let bytes = 0;
+    if (navigator.storage && navigator.storage.estimate) {
+      const est = await navigator.storage.estimate();
+      bytes = est.usage || 0;
+    }
+    const mb = (bytes / 1024 / 1024).toFixed(1);
+    const quota = (bytes > 0 && navigator.storage) ? ((await navigator.storage.estimate()).quota || 0) : 0;
+    const pct = quota ? Math.min(100, (bytes / quota * 100)).toFixed(0) : 0;
+    const el = document.getElementById('storageUsed');
+    const bar = document.getElementById('storageBar');
+    if (el) el.textContent = mb + ' MB used';
+    if (bar) { bar.style.width = pct + '%'; bar.style.background = pct > 80 ? '#C0392B' : pct > 60 ? '#C8971A' : '#7B1818'; }
+  } catch(e) {
+    const el = document.getElementById('storageUsed');
+    if (el) el.textContent = 'IndexedDB';
+  }
+}
+
+// ── EXPORT HTML (cases + images) ──────────────────────────────────────────────
+async function exportHTML() {
+  if (!cases.length) { showToast('No cases to export', 'error'); return; }
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function fd(v) { if(!v) return ''; const [yr,mo,dy]=v.split('-'); return parseInt(dy)+' '+months[parseInt(mo)-1]+' '+yr; }
+
+  const allIDB = await getAllImagesFromIDB();
+  const cardsHtml = cases.map((c,ci) => {
+    const cImgs = allIDB[c.ts] || [];
+    const imgs = cImgs.map((src,ii) =>
+      '<img src="'+src+'" style="width:80px;height:80px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid #ddd" onclick="lb('+ci+','+ii+')">'
+    ).join('');
+    const devs = (c.deviceArr||c.devices||'').toString().split(' | ').filter(Boolean).map(d=>'<div>🔧 '+d+'</div>').join('');
+    return '<div style="background:white;border-radius:12px;padding:16px;margin-bottom:12px;border-left:3px solid #7B1818;box-shadow:0 1px 4px rgba(0,0,0,0.08)">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:6px">' +
+      '<strong style="font-size:15px">'+c.pid+'</strong>' +
+      '<span style="font-size:12px;color:#888">'+fd(c.date)+'</span></div>' +
+      (c.age||c.gender?'<div style="font-size:12px;color:#888;margin-bottom:4px">'+(c.age?c.age+'y':'')+' '+(c.gender||'')+'</div>':'') +
+      '<div style="font-size:13px;color:#7B1818;font-weight:500;margin-bottom:4px">'+[c.proc,c.territory].filter(Boolean).join(' · ')+'</div>' +
+      devs +
+      (c.outcome?'<div style="font-size:12px;margin-top:4px">✅ '+c.outcome+'</div>':'') +
+      (c.notes?'<div style="font-size:12px;color:#555;margin-top:6px;line-height:1.5">'+c.notes+'</div>':'') +
+      (imgs?'<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'+imgs+'</div>':'') +
+      '</div>';
+  }).join('');
+
+  // Build all images array for lightbox
+  const allImgs = JSON.stringify(cases.map(c => allIDB[c.ts] || []));
+
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>DSA Cases Export ' + new Date().toLocaleDateString() + '</title>' +
+    '<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">' +
+    '<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:DM Sans,sans-serif;background:#F9F5F5;padding:20px}' +
+    'h1{color:#4A0E0E;margin-bottom:16px;font-size:20px}.lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:999}' +
+    '.lb.on{display:flex}.lb img{max-width:95vw;max-height:82vh;object-fit:contain;border-radius:8px}.lb-close{position:absolute;top:16px;right:20px;color:white;font-size:26px;cursor:pointer;background:rgba(255,255,255,.15);border:none;border-radius:50%;width:38px;height:38px}' +
+    '.lb-nav{display:flex;gap:16px;margin-top:14px}.lb-nav button{background:rgba(255,255,255,.15);color:white;border:none;padding:9px 22px;border-radius:20px;cursor:pointer;font-size:15px}' +
+    '.lb-ctr{color:rgba(255,255,255,.6);font-size:13px;margin-top:6px}</style></head><body>' +
+    '<h1>🩻 DSA Cases — Exported ' + new Date().toLocaleDateString() + '</h1>' +
+    '<p style="font-size:12px;color:#888;margin-bottom:16px">' + cases.length + ' cases · Tap images to enlarge</p>' +
+    cardsHtml +
+    '<div class="lb" id="lb"><button class="lb-close" onclick="cl()">✕</button><img id="li" src=""><div class="lb-nav"><button onclick="ln(-1)">← Prev</button><button onclick="ln(1)">Next →</button></div><div class="lb-ctr" id="lc"></div></div>' +
+    '<script>var AI=' + allImgs + ',ci=0,ii=0;' +
+    'function lb(c,i){ci=c;ii=i;sh()}function sh(){if(!AI[ci]||!AI[ci][ii])return;document.getElementById("li").src=AI[ci][ii];document.getElementById("lc").textContent=(ii+1)+" / "+AI[ci].length;document.getElementById("lb").classList.add("on")}' +
+    'function cl(){document.getElementById("lb").classList.remove("on")}' +
+    'function ln(d){ii=(ii+d+AI[ci].length)%AI[ci].length;sh()}' +
+    'document.getElementById("lb").addEventListener("click",function(e){if(e.target===this)cl()});' +
+    '<\/script></body></html>';
+
+  const a = document.createElement('a');
+  a.href = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+  a.download = 'DSA_Cases_Export_' + new Date().toISOString().split('T')[0] + '.html';
+  a.click();
+  showToast('📄 HTML exported with images!', 'success');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg, type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.className='toast',2800);
+}
+</script>
+</body>
+</html>
