@@ -1725,66 +1725,77 @@ async function updateStorageBar() {
 // ── EXPORT HTML (cases + images) ──────────────────────────────────────────────
 async function exportHTML() {
   if (!cases.length) { showToast('No cases to export', 'error'); return; }
+  showToast('⏳ Building export…', '');
+
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   function fd(v) { if(!v) return ''; const [yr,mo,dy]=v.split('-'); return parseInt(dy)+' '+months[parseInt(mo)-1]+' '+yr; }
 
   const allIDB = await getAllImagesFromIDB();
+
   const cardsHtml = cases.map((c,ci) => {
     const cImgs = allIDB[c.ts] || [];
     const imgs = cImgs.map((src,ii) =>
       '<img src="'+src+'" style="width:80px;height:80px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid #ddd" onclick="lb('+ci+','+ii+')">'
     ).join('');
-    const devs = (c.deviceArr||c.devices||'').toString().split(' | ').filter(Boolean).map(d=>'<div>🔧 '+d+'</div>').join('');
+    const devs = (c.deviceArr||c.devices||'').toString().split(' | ').filter(Boolean).map(d=>'<div style="font-size:12px;margin-top:2px">🔧 '+d+'</div>').join('');
     return '<div style="background:white;border-radius:12px;padding:16px;margin-bottom:12px;border-left:3px solid #7B1818;box-shadow:0 1px 4px rgba(0,0,0,0.08)">' +
       '<div style="display:flex;justify-content:space-between;margin-bottom:6px">' +
-      '<strong style="font-size:15px">'+c.pid+'</strong>' +
+      '<strong style="font-size:15px">'+(c.pid||'—')+(c.name?' · <span style="font-weight:400">'+c.name+'</span>':'')+'</strong>' +
       '<span style="font-size:12px;color:#888">'+fd(c.date)+'</span></div>' +
-      (c.age||c.gender?'<div style="font-size:12px;color:#888;margin-bottom:4px">'+(c.age?c.age+'y':'')+' '+(c.gender||'')+'</div>':'') +
-      '<div style="font-size:13px;color:#7B1818;font-weight:500;margin-bottom:4px">'+[c.proc,c.territory].filter(Boolean).join(' · ')+'</div>' +
+      (c.age||c.gender?'<div style="font-size:12px;color:#888;margin-bottom:4px">'+(c.age?c.age+'y ':'')+' '+(c.gender||'')+'</div>':'') +
+      '<div style="font-size:13px;color:#7B1818;font-weight:500;margin-bottom:4px">'+[c.indication,c.proc,c.territory].filter(Boolean).join(' · ')+'</div>' +
       devs +
+      (c.devicespec?'<div style="font-size:12px;color:#555;margin-top:2px">📐 '+c.devicespec+'</div>':'') +
       (c.outcome?'<div style="font-size:12px;margin-top:4px">✅ '+c.outcome+'</div>':'') +
-      (c.notes?'<div style="font-size:12px;color:#555;margin-top:6px;line-height:1.5">'+c.notes+'</div>':'') +
+      (c.comp&&c.comp!=='None'?'<div style="font-size:12px;color:#C0392B;margin-top:2px">⚠️ '+c.comp+'</div>':'') +
+      (c.nihss?'<div style="font-size:12px;margin-top:4px">🧠 NIHSS: '+c.nihss+(c.onset?' | Onset: '+c.onset:'')+(c.puncture?' | Puncture: '+c.puncture:'')+(c.recan?' | Recan: '+c.recan:'')+'</div>':'') +
+      (c.notes?'<div style="font-size:12px;color:#555;margin-top:6px;line-height:1.5;border-top:1px solid #f0f0f0;padding-top:6px">'+c.notes+'</div>':'') +
       (imgs?'<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'+imgs+'</div>':'') +
       '</div>';
   }).join('');
 
-  // Build all images array for lightbox
   const allImgs = JSON.stringify(cases.map(c => allIDB[c.ts] || []));
 
   const html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>DSA Cases Export ' + new Date().toLocaleDateString() + '</title>' +
-    '<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">' +
-    '<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:DM Sans,sans-serif;background:#F9F5F5;padding:20px}' +
-    'h1{color:#4A0E0E;margin-bottom:16px;font-size:20px}.lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:999}' +
-    '.lb.on{display:flex}.lb img{max-width:95vw;max-height:82vh;object-fit:contain;border-radius:8px}.lb-close{position:absolute;top:16px;right:20px;color:white;font-size:26px;cursor:pointer;background:rgba(255,255,255,.15);border:none;border-radius:50%;width:38px;height:38px}' +
+    '<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;background:#F9F5F5;padding:16px;max-width:600px;margin:0 auto}' +
+    'h1{color:#4A0E0E;margin-bottom:4px;font-size:18px}' +
+    '.lb{position:fixed;inset:0;background:rgba(0,0,0,.93);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:999}' +
+    '.lb.on{display:flex}.lb img{max-width:95vw;max-height:80vh;object-fit:contain;border-radius:8px}' +
+    '.lb-close{position:absolute;top:16px;right:20px;color:white;font-size:24px;cursor:pointer;background:rgba(255,255,255,.2);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center}' +
     '.lb-nav{display:flex;gap:16px;margin-top:14px}.lb-nav button{background:rgba(255,255,255,.15);color:white;border:none;padding:9px 22px;border-radius:20px;cursor:pointer;font-size:15px}' +
     '.lb-ctr{color:rgba(255,255,255,.6);font-size:13px;margin-top:6px}</style></head><body>' +
-    '<h1>🩻 DSA Cases — Exported ' + new Date().toLocaleDateString() + '</h1>' +
-    '<p style="font-size:12px;color:#888;margin-bottom:16px">' + cases.length + ' cases · Tap images to enlarge</p>' +
+    '<h1>🩻 DSA Case Export</h1>' +
+    '<p style="font-size:12px;color:#888;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #e0d5d5">' + cases.length + ' cases · ' + new Date().toLocaleDateString() + ' · Tap images to enlarge</p>' +
     cardsHtml +
     '<div class="lb" id="lb"><button class="lb-close" onclick="cl()">✕</button><img id="li" src=""><div class="lb-nav"><button onclick="ln(-1)">← Prev</button><button onclick="ln(1)">Next →</button></div><div class="lb-ctr" id="lc"></div></div>' +
-    '<script>var AI=' + allImgs + ',ci=0,ii=0;' +
-    'function lb(c,i){ci=c;ii=i;sh()}function sh(){if(!AI[ci]||!AI[ci][ii])return;document.getElementById("li").src=AI[ci][ii];document.getElementById("lc").textContent=(ii+1)+" / "+AI[ci].length;document.getElementById("lb").classList.add("on")}' +
+    '<script>var AI='+allImgs+',ci=0,ii=0;' +
+    'function lb(c,i){ci=c;ii=i;sh()}' +
+    'function sh(){if(!AI[ci]||!AI[ci][ii])return;document.getElementById("li").src=AI[ci][ii];document.getElementById("lc").textContent=(ii+1)+" / "+AI[ci].length;document.getElementById("lb").classList.add("on")}' +
     'function cl(){document.getElementById("lb").classList.remove("on")}' +
     'function ln(d){ii=(ii+d+AI[ci].length)%AI[ci].length;sh()}' +
     'document.getElementById("lb").addEventListener("click",function(e){if(e.target===this)cl()});' +
     '<\/script></body></html>';
 
-  // Use Blob URL — Safari iOS blocks data: URL downloads
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-  const blobUrl = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = blobUrl;
-  a.download = 'DSA_Cases_Export_' + new Date().toISOString().split('T')[0] + '.html';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  // Safari sometimes needs the blob open in a new tab as fallback
-  setTimeout(() => {
-    URL.revokeObjectURL(blobUrl);
-  }, 5000);
-  showToast('📄 HTML exported — check Files app', 'success');
+  // Safari iOS: open in new tab — most reliable method
+  // The user can then tap Share → Save to Files from the new tab
+  try {
+    const blob = new Blob([html], { type: 'text/html' });
+    const blobUrl = URL.createObjectURL(blob);
+    const newTab = window.open(blobUrl, '_blank');
+    if (newTab) {
+      showToast('✅ Opened in new tab — tap Share → Save to Files', 'success');
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
+    } else {
+      // Pop-up blocked — fallback: write into a new window
+      const w = window.open('', '_blank');
+      if (w) { w.document.write(html); w.document.close(); showToast('✅ Opened — tap Share → Save to Files', 'success'); }
+      else { showToast('⚠️ Allow pop-ups in Safari settings', 'error'); }
+    }
+  } catch(e) {
+    showToast('Export failed: ' + e.message, 'error');
+  }
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────────────────
