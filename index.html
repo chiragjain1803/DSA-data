@@ -1540,11 +1540,17 @@ async function exportCSV() {
     const imgFields = Array.from({length:8}, (_,i) => imgs[i] ? '"[image_' + (i+1) + '_embedded]"' : '""');
     return [...base, ...imgFields].join(',');
   });
-  const a=document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent([h.join(','),...rows].join('\n'));
-  a.download='DSA_Cases_'+new Date().toISOString().split('T')[0]+'.csv';
+  const csvContent = [h.join(','), ...rows].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = 'DSA_Cases_' + new Date().toISOString().split('T')[0] + '.csv';
+  document.body.appendChild(a);
   a.click();
-  showToast('✅ CSV exported (use Export HTML for images)','success');
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+  showToast('✅ CSV exported — check Files app', 'success');
 }
 
 
@@ -1765,11 +1771,20 @@ async function exportHTML() {
     'document.getElementById("lb").addEventListener("click",function(e){if(e.target===this)cl()});' +
     '<\/script></body></html>';
 
+  // Use Blob URL — Safari iOS blocks data: URL downloads
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const blobUrl = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+  a.href = blobUrl;
   a.download = 'DSA_Cases_Export_' + new Date().toISOString().split('T')[0] + '.html';
+  document.body.appendChild(a);
   a.click();
-  showToast('📄 HTML exported with images!', 'success');
+  document.body.removeChild(a);
+  // Safari sometimes needs the blob open in a new tab as fallback
+  setTimeout(() => {
+    URL.revokeObjectURL(blobUrl);
+  }, 5000);
+  showToast('📄 HTML exported — check Files app', 'success');
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────────────────
